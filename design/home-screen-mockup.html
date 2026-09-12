@@ -1,0 +1,704 @@
+<title>Nyaya Kavach</title>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Tiro+Devanagari+Hindi&family=Hind:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+
+<style>
+:root{
+  --paper:#F5F2E8; --card:#FFFFFF; --card-2:#FAF7EF;
+  --forest:#123D2F; --forest-2:#1B5A44; --forest-3:#0C2C22;
+  --on-forest:#EEF4EF; --on-forest-dim:#A9C4B6;
+  --ink:#16221D; --ink-2:#4C5B54; --ink-3:#7C8B83;
+  --line:#E3DED0; --line-2:#EFEBDE;
+  --siren:#C4202F; --siren-deep:#96111F; --on-siren:#FFF4F2;
+  --brass:#8C6510; --brass-bg:#FAEFD5;
+  --leaf:#166B4F; --leaf-bg:#E4F0E8;
+  --shadow:0 1px 2px rgba(18,61,47,.05), 0 8px 22px -12px rgba(18,61,47,.22);
+  --bezel:#0A1310;
+
+  --display:"Tiro Devanagari Hindi", "Noto Serif Devanagari", Georgia, serif;
+  --ui:"Hind", "Noto Sans Devanagari", system-ui, -apple-system, sans-serif;
+  --mono:"IBM Plex Mono", ui-monospace, "Cascadia Mono", Consolas, monospace;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --paper:#0A1310; --card:#14201B; --card-2:#182720;
+    --forest:#0E2A21; --forest-2:#154033; --forest-3:#081E17;
+    --on-forest:#E7F0E9; --on-forest-dim:#8FAE9F;
+    --ink:#E9E7DE; --ink-2:#A3B2A9; --ink-3:#79887F;
+    --line:#26352D; --line-2:#1F2C25;
+    --siren:#DE4152; --siren-deep:#A81B2C; --on-siren:#FFF2F2;
+    --brass:#DBA94F; --brass-bg:#2A2314;
+    --leaf:#5DC49B; --leaf-bg:#122B22;
+    --shadow:0 1px 2px rgba(0,0,0,.4), 0 10px 28px -14px rgba(0,0,0,.75);
+    --bezel:#040A07;
+  }
+}
+:root[data-theme="dark"]{
+  --paper:#0A1310; --card:#14201B; --card-2:#182720;
+  --forest:#0E2A21; --forest-2:#154033; --forest-3:#081E17;
+  --on-forest:#E7F0E9; --on-forest-dim:#8FAE9F;
+  --ink:#E9E7DE; --ink-2:#A3B2A9; --ink-3:#79887F;
+  --line:#26352D; --line-2:#1F2C25;
+  --siren:#DE4152; --siren-deep:#A81B2C; --on-siren:#FFF2F2;
+  --brass:#DBA94F; --brass-bg:#2A2314;
+  --leaf:#5DC49B; --leaf-bg:#122B22;
+  --shadow:0 1px 2px rgba(0,0,0,.4), 0 10px 28px -14px rgba(0,0,0,.75);
+  --bezel:#040A07;
+}
+
+*{box-sizing:border-box}
+body{margin:0; background:var(--paper); color:var(--ink);
+  font-family:var(--ui); font-size:15px; line-height:1.5; -webkit-font-smoothing:antialiased}
+:focus-visible{outline:2px solid var(--leaf); outline-offset:2px; border-radius:4px}
+
+/* ── review canvas ─────────────────────────────────── */
+.canvas{max-width:1180px; margin:0 auto; padding:40px 24px 72px;
+  display:grid; gap:48px; grid-template-columns:1fr}
+@media (min-width:1040px){
+  .canvas{grid-template-columns:1fr 430px; gap:64px; align-items:start}
+  .stage{position:sticky; top:40px}
+}
+.eyebrow{font:600 11px/1 var(--ui); letter-spacing:.1em; text-transform:uppercase; color:var(--ink-3); margin:0}
+.rail h1{font:400 40px/1.12 var(--display); margin:14px 0 0; text-wrap:balance; letter-spacing:-.01em}
+.rail .lede{margin:14px 0 0; max-width:58ch; color:var(--ink-2); font-size:16px}
+.controls{display:flex; flex-wrap:wrap; gap:10px; margin-top:28px; align-items:center}
+.seg{display:inline-flex; background:var(--card); border:1px solid var(--line); border-radius:9px;
+  padding:3px; box-shadow:var(--shadow)}
+.seg button{appearance:none; border:0; background:none; cursor:pointer; font:500 12.5px/1 var(--ui);
+  color:var(--ink-2); padding:8px 11px; border-radius:6px; white-space:nowrap; font-family:var(--ui)}
+.seg button[aria-pressed="true"]{background:var(--forest); color:var(--on-forest)}
+.seg button:hover:not([aria-pressed="true"]){color:var(--ink)}
+.seg-label{font:600 10.5px/1 var(--ui); letter-spacing:.1em; text-transform:uppercase; color:var(--ink-3)}
+.notes{margin-top:40px; border-top:1px solid var(--line); padding-top:4px}
+.note{border-bottom:1px solid var(--line); padding:18px 0; display:grid;
+  grid-template-columns:92px 1fr; gap:20px; align-items:start}
+.note code{font:500 11px/1.5 var(--mono); color:var(--leaf); display:block}
+.note h3{margin:0 0 4px; font:600 14.5px/1.35 var(--ui)}
+.note p{margin:0; color:var(--ink-2); font-size:13.5px; line-height:1.55}
+.note.deny h3{color:var(--siren)}
+@media (max-width:600px){.note{grid-template-columns:1fr; gap:6px}}
+
+/* ── device: fixed height, nothing scrolls ─────────── */
+.device{width:414px; max-width:100%; margin:0 auto; background:var(--bezel);
+  border-radius:44px; padding:11px;
+  box-shadow:0 2px 4px rgba(0,0,0,.2), 0 40px 80px -40px rgba(10,19,16,.6)}
+.screen{background:var(--paper); border-radius:34px; height:812px; overflow:hidden;
+  display:flex; flex-direction:column; position:relative}
+
+/* ── green panel ───────────────────────────────────── */
+.panel{background:linear-gradient(165deg, var(--forest-2), var(--forest) 62%, var(--forest-3));
+  color:var(--on-forest); border-radius:34px 34px 22px 22px; padding:10px 16px 14px; flex:none}
+.statusbar{display:flex; justify-content:space-between; align-items:center; padding:2px 6px 6px;
+  font:500 12px/1 var(--mono); font-variant-numeric:tabular-nums; color:var(--on-forest)}
+.statusbar svg{display:block; opacity:.9}
+.appbar{display:flex; align-items:center; gap:10px}
+.mark{width:36px; height:36px; flex:none}
+.wordmark{flex:1; min-width:0}
+.wordmark b{display:block; font:400 18px/1.15 var(--display); letter-spacing:.005em}
+.wordmark small{display:block; font:400 10px/1.3 var(--ui); color:var(--on-forest-dim); letter-spacing:.03em}
+.lang{display:inline-flex; border:1px solid rgba(238,244,239,.32); border-radius:16px; overflow:hidden; flex:none}
+.lang button{appearance:none; border:0; background:none; cursor:pointer; font:600 11px/1 var(--ui);
+  color:var(--on-forest-dim); padding:6px 8px; font-family:var(--ui)}
+.lang button[aria-pressed="true"]{background:var(--on-forest); color:var(--forest)}
+.icobtn{width:32px; height:32px; border-radius:50%; border:1px solid rgba(238,244,239,.3);
+  background:rgba(255,255,255,.07); display:grid; place-items:center; cursor:pointer; flex:none; position:relative}
+.icobtn i{position:absolute; top:4px; right:5px; width:7px; height:7px; border-radius:50%;
+  background:var(--siren); border:1.5px solid var(--forest)}
+.avatar{width:32px; height:32px; border-radius:50%; flex:none; background:var(--brass-bg);
+  border:1px solid rgba(238,244,239,.35); display:grid; place-items:center;
+  font:600 12px/1 var(--ui); color:var(--brass); cursor:pointer}
+
+.hello{display:flex; align-items:flex-end; justify-content:space-between; gap:12px; margin-top:12px}
+.hello h2{margin:0; font:400 25px/1.15 var(--display)}
+.hello p{margin:3px 0 0; font-size:12px; color:var(--on-forest-dim)}
+.chip{flex:none; display:inline-flex; align-items:center; gap:6px; border-radius:16px; padding:6px 10px;
+  background:rgba(255,255,255,.12); border:1px solid rgba(238,244,239,.26);
+  font:600 10.5px/1 var(--mono); letter-spacing:.07em}
+.chip.free{background:rgba(0,0,0,.18)}
+
+.place{display:flex; align-items:center; gap:10px; margin-top:12px;
+  background:rgba(0,0,0,.2); border:1px solid rgba(238,244,239,.16); border-radius:12px; padding:8px 10px}
+.place svg{flex:none}
+.place div{flex:1; min-width:0}
+.place b{display:block; font:500 12.5px/1.25 var(--ui); color:var(--on-forest)}
+.place small{display:block; font:400 9.5px/1.3 var(--ui); color:var(--on-forest-dim);
+  letter-spacing:.05em; text-transform:uppercase}
+
+/* case state inside the panel */
+.window{margin-top:12px; background:rgba(0,0,0,.24); border:1px solid rgba(219,169,79,.4);
+  border-radius:12px; padding:10px 11px}
+.window .row{display:flex; align-items:baseline; justify-content:space-between; gap:8px}
+.window span{font:600 9.5px/1 var(--ui); letter-spacing:.1em; text-transform:uppercase; color:var(--brass)}
+.window b{font:600 17px/1 var(--mono); font-variant-numeric:tabular-nums; color:var(--on-forest)}
+.window .pair{display:flex; gap:6px; margin-top:9px}
+.window .pair span{flex:1; display:flex; align-items:center; gap:5px; border-radius:8px; padding:6px 7px;
+  font:600 9.5px/1.15 var(--ui); letter-spacing:.02em; text-transform:none}
+.window .pair .ok{background:rgba(93,196,155,.16); color:#8FE0C0; border:1px solid rgba(93,196,155,.3)}
+.window .pair .no{background:rgba(219,169,79,.16); color:#F0C878; border:1px solid rgba(219,169,79,.4)}
+
+/* ── body sections ─────────────────────────────────── */
+.stack{flex:1; display:flex; flex-direction:column; gap:9px; padding:11px 14px 0; min-height:0}
+.label{display:flex; align-items:baseline; justify-content:space-between; gap:10px; flex:none}
+.label span{font:600 10px/1 var(--ui); letter-spacing:.12em; text-transform:uppercase; color:var(--ink-3)}
+.label a{font:600 11px/1 var(--ui); color:var(--leaf); text-decoration:none}
+
+/* ── emergency: the only red ───────────────────────── */
+.emg{flex:none; background:var(--siren); color:var(--on-siren); border-radius:14px; overflow:hidden;
+  box-shadow:0 8px 20px -12px rgba(150,17,31,.75)}
+.emg-body{display:flex; align-items:center; gap:11px; padding:11px 12px}
+.emg-txt{flex:1; min-width:0}
+.emg-txt b{display:block; font:400 16.5px/1.2 var(--display)}
+.emg-txt small{display:block; font:400 11px/1.35 var(--ui); opacity:.93; margin-top:2px}
+.emg-body button{appearance:none; border:0; cursor:pointer; flex:none; background:var(--on-siren);
+  color:var(--siren-deep); font:600 12.5px/1 var(--ui); font-family:var(--ui);
+  padding:11px 13px; border-radius:10px; display:inline-flex; align-items:center; gap:6px}
+.emg-body button:active{transform:translateY(1px)}
+.siren-dot{width:30px; height:30px; border-radius:50%; background:rgba(255,255,255,.18);
+  display:grid; place-items:center; flex:none; animation:pulse 2.6s ease-in-out infinite}
+@keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(255,255,255,.35)} 55%{box-shadow:0 0 0 7px rgba(255,255,255,0)}}
+.emg-notice{display:flex; align-items:center; gap:7px; padding:7px 12px; background:rgba(0,0,0,.17);
+  border-top:1px solid rgba(255,255,255,.24); font:600 10.5px/1.3 var(--ui)}
+
+/* ── the feature grid ──────────────────────────────── */
+.grid{flex:1; min-height:0; display:grid; grid-template-columns:1fr 1fr; gap:8px;
+  grid-auto-rows:minmax(56px,1fr)}
+.tile{background:var(--card); border:1px solid var(--line); border-radius:13px; padding:9px 10px;
+  display:flex; align-items:center; gap:9px; cursor:pointer; text-align:left;
+  font-family:var(--ui); color:inherit; position:relative; overflow:hidden; min-width:0}
+.tile:hover{border-color:var(--leaf)}
+.tile .ico{width:30px; height:30px; border-radius:9px; display:grid; place-items:center; flex:none}
+.tile .txt{min-width:0; flex:1}
+.tile b{display:block; font:600 12.5px/1.2 var(--ui); letter-spacing:-.005em}
+.tile em{display:block; font-style:normal; font:500 10px/1.25 var(--mono); color:var(--ink-2); margin-top:3px;
+  white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
+.tile em.hot{color:var(--brass)}
+.tile em.calm{color:var(--leaf)}
+.tile .seal{position:absolute; right:-14px; bottom:-16px; opacity:.06; pointer-events:none}
+
+/* ── alerts ────────────────────────────────────────── */
+.alerts{flex:none; background:var(--card); border:1px solid var(--line); border-radius:13px; overflow:hidden}
+.alert{display:flex; align-items:center; gap:10px; padding:8px 11px; width:100%; text-align:left;
+  background:none; border:0; border-bottom:1px solid var(--line-2); cursor:pointer; font-family:var(--ui); color:inherit}
+.alert:last-child{border-bottom:0}
+.alert:hover{background:var(--card-2)}
+.days{flex:none; min-width:38px; text-align:center; border-radius:8px; padding:5px 4px;
+  font:600 11px/1 var(--mono); font-variant-numeric:tabular-nums}
+.days.soon{background:var(--brass-bg); color:var(--brass)}
+.days.later{background:var(--leaf-bg); color:var(--leaf)}
+.alert .txt{flex:1; min-width:0}
+.alert b{display:block; font:500 12.5px/1.2 var(--ui)}
+.alert em{display:block; font-style:normal; font:400 10px/1.3 var(--mono); color:var(--ink-3); margin-top:2px;
+  white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
+.alert .go{flex:none; font:600 10.5px/1 var(--ui); color:var(--leaf)}
+
+/* ── nav ───────────────────────────────────────────── */
+.nav{flex:none; margin-top:9px; background:var(--card); border-top:1px solid var(--line);
+  display:grid; grid-template-columns:repeat(5,1fr); padding:7px 4px 14px}
+.nav button{appearance:none; border:0; background:none; cursor:pointer; padding:3px 0;
+  display:grid; justify-items:center; gap:3px; font:500 9.5px/1 var(--ui); color:var(--ink-3); font-family:var(--ui)}
+.nav button[aria-current="page"]{color:var(--forest); font-weight:600}
+:root[data-theme="dark"] .nav button[aria-current="page"]{color:var(--leaf)}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]) .nav button[aria-current="page"]{color:var(--leaf)}
+}
+.nav button[aria-current="page"] .bar{opacity:1}
+.bar{width:16px; height:2px; border-radius:2px; background:currentColor; opacity:0}
+
+/* ── state visibility ──────────────────────────────── */
+[data-state="default"] .only-case,
+[data-state="default"] .only-free{display:none}
+[data-state="case"] .only-default,
+[data-state="case"] .only-free,
+[data-state="case"] .not-case{display:none}
+[data-state="free"] .only-default,
+[data-state="free"] .only-case,
+[data-state="free"] .not-free{display:none}
+
+@media (prefers-reduced-motion: reduce){
+  *{animation-duration:.001ms !important; animation-iteration-count:1 !important; transition-duration:.001ms !important}
+}
+</style>
+
+<div class="canvas">
+
+  <!-- ════════ review rail ════════ -->
+  <div class="rail">
+    <p class="eyebrow">Nyaya Kavach · home screen · v2 · one screen, no scroll</p>
+    <h1>Every feature on one screen, and only one of them is red.</h1>
+    <p class="lede">A no-scroll home is a budget: 812 pixels, and nothing earns space twice. So the eleven things
+      this product actually does each appear exactly once, the green panel carries identity and status, and the
+      emergency path keeps the only red on the screen — because most days this is a filing cabinet, and roughly
+      once a year it is the screen someone opens twenty minutes after ₹84,000 left their account.</p>
+
+    <div class="controls">
+      <span class="seg-label">State</span>
+      <div class="seg" role="group" aria-label="Screen state">
+        <button type="button" data-set-state="default" aria-pressed="true">Paid · calm</button>
+        <button type="button" data-set-state="case" aria-pressed="false">Fraud case open</button>
+        <button type="button" data-set-state="free" aria-pressed="false">Free tier</button>
+      </div>
+    </div>
+
+    <div class="notes">
+      <div class="note">
+        <code>NO SCROLL</code>
+        <div>
+          <h3>The grid absorbs the slack, so nothing ever clips</h3>
+          <p>The screen is a flex column at a fixed 812px. Panel, emergency bar, alerts and nav take the height they
+            need; the feature grid takes whatever is left, with rows set to <code style="display:inline">minmax(56px, 1fr)</code>.
+            When a state adds height — an open case grows the panel — the grid gives the pixels back instead of
+            pushing a scrollbar into existence.</p>
+        </div>
+      </div>
+      <div class="note">
+        <code>DEDUPED</code>
+        <div>
+          <h3>Your reference showed three features twice</h3>
+          <p>"My Documents" and "Legal Vault" are one module. "Scam Check" and "Cyber Shield" are one module. "AI
+            Assistant" sat in both rows. On a screen with no scroll that is roughly 120 wasted pixels, and it makes a
+            user wonder whether two tiles do two different things. Every feature here appears once — Vault,
+            Understand, Ask, Scam Check, Advocate, Family, Plan, Guides, plus Emergency on its own bar.</p>
+        </div>
+      </div>
+      <div class="note">
+        <code>FR-EMG-01<br>NFR-01</code>
+        <div>
+          <h3>Emergency is a bar, not a tile in a row of five</h3>
+          <p>In your reference it was a 70px square between Scam Check and My Documents. A person whose hands are
+            shaking should not have to read five labels. It is full width, it is the only thing on the screen wearing
+            this red, and no other feature may borrow the colour — the moment it appears twice it stops meaning
+            emergency.</p>
+        </div>
+      </div>
+      <div class="note">
+        <code>FR-CMP-08</code>
+        <div>
+          <h3>"We never ask for your OTP or PIN" is welded to the red bar</h3>
+          <p>Not a footer line. The moment a user taps for help is the exact moment a real fraudster calls claiming
+            to be us, so the notice travels with the button. It repeats on every assistant and emergency screen.</p>
+        </div>
+      </div>
+      <div class="note">
+        <code>FR-EMG-04<br>FR-EMG-05</code>
+        <div>
+          <h3>An open case replaces the marketing, not the features</h3>
+          <p>Switch to <em>Fraud case open</em>. The status line and location pill give way to a live RBI window
+            countdown with both reports shown separately — bank filed, 1930 still pending. One report is worth very
+            little; zero liability needs both inside five calendar days, so the missing one is the loudest thing in
+            the panel.</p>
+        </div>
+      </div>
+      <div class="note">
+        <code>FR-AUTH-05<br>FR-CON-04</code>
+        <div>
+          <h3>The location pill has a job</h3>
+          <p>It is labelled <em>advocate jurisdiction</em> rather than being a decorative address bar. City is what
+            allocation filters on — district first, then language, then availability — so the user can see and
+            correct the thing that decides who picks up their case.</p>
+        </div>
+      </div>
+      <div class="note">
+        <code>FR-SUB-06<br>FR-SUB-07</code>
+        <div>
+          <h3>Every tile carries live state instead of a description</h3>
+          <p>"24 documents", "2 left this year", "3 checks left this month". Switch to <em>Free tier</em> and the
+            numbers change, not the layout. Counts come from the server's entitlement record — the client hides UI,
+            the API decides what is allowed.</p>
+        </div>
+      </div>
+      <div class="note">
+        <code>FR-SUB-07<br>FR-EMG-03</code>
+        <div>
+          <h3>Free still gets the red bar</h3>
+          <p>Free has no assistant line, so the copy stops promising a callback and offers what costs us nothing:
+            both numbers and the words to say, immediately. Metering someone at 2am who is losing money is the wrong
+            trade, and it is the honest pitch — what Shield sells is <em>someone staying on the line</em>.</p>
+        </div>
+      </div>
+      <div class="note">
+        <code>FR-CMP-04</code>
+        <div>
+          <h3>Information and advice never look alike</h3>
+          <p>"Ask a Question" is permanently labelled <em>information, not advice</em>. "Talk to an Advocate" carries
+            the seal motif and promises a letterhead opinion. Two visual worlds, so nobody mistakes a chatbot answer
+            for a lawyer's.</p>
+        </div>
+      </div>
+      <div class="note">
+        <code>COLOUR</code>
+        <div>
+          <h3>Forest green, ivory, brass, one red</h3>
+          <p>Green from your reference, but pushed deeper (#123D2F) so white type clears AA on it. Brass (#8C6510)
+            carries every deadline, green every healthy state, red only the emergency. Four jobs, four colours —
+            a user learns the code in one session. Both light and dark are drawn; try your system setting.</p>
+        </div>
+      </div>
+      <div class="note deny">
+        <code>FR-CMP-01<br>FR-CMP-02<br>FR-SUB-02</code>
+        <div>
+          <h3>Deliberately absent</h3>
+          <p>No advocate list, photo or star rating, and no advocate named anywhere a prospective user can see. No
+            price and no "Upgrade ₹999" button — the plan tile links to web checkout, because a Play Store purchase
+            button hands 15–30% of a ₹999 product to the store. And no promise of recovering money, in either
+            language: the offer is filing and follow-up.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ════════ device ════════ -->
+  <div class="stage">
+  <div class="device">
+  <div class="screen" id="phone" data-state="default">
+
+    <!-- ── green panel ── -->
+    <div class="panel">
+      <div class="statusbar">
+        <span>9:41</span>
+        <svg width="56" height="12" viewBox="0 0 58 12" fill="none" aria-hidden="true">
+          <path d="M1 9h2v2H1zM5 7h2v4H5zM9 4h2v7H9zM13 1h2v10h-2z" fill="currentColor"/>
+          <path d="M23 9.2 19.4 5.6a5.2 5.2 0 0 1 7.2 0L23 9.2z" fill="currentColor"/>
+          <path d="M18.2 4.4a6.8 6.8 0 0 1 9.6 0" stroke="currentColor" stroke-width="1.4" fill="none"/>
+          <rect x="38" y="2" width="17" height="8" rx="2.2" stroke="currentColor" stroke-width="1.2" fill="none"/>
+          <rect x="39.6" y="3.6" width="12" height="4.8" rx="1" fill="currentColor"/>
+          <path d="M56.4 5v2" stroke="currentColor" stroke-width="1.6"/>
+        </svg>
+      </div>
+
+      <div class="appbar">
+        <svg class="mark" viewBox="0 0 40 40" aria-hidden="true">
+          <path d="M20 3 6 8v13c0 8.4 5.8 14.2 14 16 8.2-1.8 14-7.6 14-16V8L20 3z" fill="var(--on-forest)"/>
+          <path d="M20 12v13M13.5 16h13M14 16l-2.4 5h4.8L14 16zM26 16l-2.4 5h4.8L26 16zM16 27h8"
+            stroke="var(--forest)" stroke-width="1.7" stroke-linecap="round" fill="none"/>
+        </svg>
+        <div class="wordmark">
+          <b>Nyaya&nbsp;Kavach</b>
+          <small data-hi="आपका कानून। हमारी सुरक्षा।">Your legal. Our protection.</small>
+        </div>
+        <div class="lang" role="group" aria-label="Language">
+          <button type="button" data-lang="en" aria-pressed="true">EN</button>
+          <button type="button" data-lang="hi" aria-pressed="false">हिं</button>
+        </div>
+        <button class="icobtn" type="button" aria-label="Notifications, 2 unread">
+          <svg width="16" height="16" viewBox="0 0 20 20" fill="none" aria-hidden="true">
+            <path d="M10 3a5 5 0 0 0-5 5v3l-1.4 2.4A.7.7 0 0 0 4.2 15h11.6a.7.7 0 0 0 .6-1.6L15 11V8a5 5 0 0 0-5-5zM8 17a2 2 0 0 0 4 0"
+              stroke="var(--on-forest)" stroke-width="1.5" stroke-linecap="round"/>
+          </svg>
+          <i></i>
+        </button>
+        <button class="avatar" type="button" aria-label="Your account">MR</button>
+      </div>
+
+      <div class="hello">
+        <div>
+          <h2 data-hi="नमस्ते, मयंक">Hi, Mayank</h2>
+          <p class="only-default" data-hi="आपके परिवार की सुरक्षा सक्रिय है">Your family's protection is active</p>
+          <p class="only-case" data-hi="एक केस खुला है — नीचे एक रिपोर्ट बाकी है">A case is open — one report is still missing</p>
+          <p class="only-free" data-hi="फ्री प्लान — तिजोरी और जाँच शामिल हैं">Free plan — vault and checks included</p>
+        </div>
+        <span class="chip not-free">SHIELD</span>
+        <span class="chip free only-free">FREE</span>
+      </div>
+
+      <!-- calm + free: where your advocate would come from -->
+      <div class="place not-case">
+        <svg width="17" height="17" viewBox="0 0 20 20" fill="none" aria-hidden="true">
+          <path d="M10 17.4s5.4-4.6 5.4-9A5.4 5.4 0 0 0 4.6 8.4c0 4.4 5.4 9 5.4 9z" stroke="var(--on-forest-dim)" stroke-width="1.5" fill="none"/>
+          <circle cx="10" cy="8.2" r="2" stroke="var(--on-forest-dim)" stroke-width="1.5" fill="none"/>
+        </svg>
+        <div>
+          <small data-hi="वकील का क्षेत्राधिकार">Advocate jurisdiction</small>
+          <b data-hi="इंदौर, मध्य प्रदेश">Indore, Madhya Pradesh</b>
+        </div>
+        <svg width="16" height="16" viewBox="0 0 20 20" fill="none" aria-hidden="true">
+          <path d="m6 8.4 4 4 4-4" stroke="var(--on-forest)" stroke-width="1.7" stroke-linecap="round"/>
+        </svg>
+      </div>
+
+      <!-- case: the window that decides everything -->
+      <div class="window only-case">
+        <div class="row">
+          <span data-hi="RBI सुरक्षा अवधि">RBI protection window</span>
+          <b id="countdown">3d 09h 11m 42s</b>
+        </div>
+        <div class="pair">
+          <span class="ok" data-hi="बैंक · BNK/2027/88123">Bank · BNK/2027/88123</span>
+          <span class="no" data-hi="1930 · अभी बाकी">1930 · still pending</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── body ── -->
+    <div class="stack">
+
+      <!-- emergency -->
+      <div class="emg">
+        <div class="emg-body">
+          <span class="siren-dot">
+            <svg width="16" height="16" viewBox="0 0 20 20" fill="none" aria-hidden="true">
+              <path d="M10 2.6 2.2 16.4h15.6L10 2.6z" stroke="currentColor" stroke-width="1.6" fill="none" stroke-linejoin="round"/>
+              <path d="M10 7.8v3.4M10 13.6v.2" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/>
+            </svg>
+          </span>
+          <div class="emg-txt">
+            <b class="not-case" data-hi="पैसा अभी-अभी खाते से निकल गया?">Money just left your account?</b>
+            <b class="only-case" data-hi="प्रिया आपका केस देख रही हैं">Priya has your case open</b>
+            <small class="only-default" data-hi="हम लाइन पर साथ रहेंगे — बैंक और 1930, दोनों रिपोर्ट तक">We stay on the line — through the bank report and 1930, both</small>
+            <small class="only-case" data-hi="1930 रिपोर्ट पूरी करने के लिए कॉल करें">Call back to finish the 1930 report</small>
+            <small class="only-free" data-hi="दोनों नंबर और क्या बोलना है — अभी, बिना रुकावट">Both numbers and the words to say — now, no paywall</small>
+          </div>
+          <button type="button">
+            <svg width="15" height="15" viewBox="0 0 20 20" fill="none" aria-hidden="true">
+              <path d="M4.6 3h3l1.4 3.4-2 1.4a9 9 0 0 0 5.2 5.2l1.4-2L17 12.4v3A1.6 1.6 0 0 1 15.2 17C9 16.3 3.7 11 3 4.8A1.6 1.6 0 0 1 4.6 3z" fill="currentColor"/>
+            </svg>
+            <span class="only-default" data-hi="अभी मदद">Get help</span>
+            <span class="only-case" data-hi="कॉल करें">Call back</span>
+            <span class="only-free" data-hi="दिखाएँ">Show me</span>
+          </button>
+        </div>
+        <div class="emg-notice">
+          <svg width="14" height="14" viewBox="0 0 20 20" fill="none" aria-hidden="true">
+            <path d="M10 2.4 3.4 5v5.6c0 4 2.7 6.7 6.6 7.6 3.9-.9 6.6-3.6 6.6-7.6V5L10 2.4z" stroke="currentColor" stroke-width="1.5" fill="none"/>
+            <path d="M7.6 10.4 10 12.8l3-3.6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+          </svg>
+          <span data-hi="हम कभी आपका OTP, PIN या पासवर्ड नहीं मांगते।">We never ask for your OTP, PIN or password.</span>
+        </div>
+      </div>
+
+      <!-- every feature, once -->
+      <div class="label">
+        <span data-hi="आपकी सारी सुविधाएँ">Everything you have</span>
+        <a href="#" data-hi="मदद चाहिए?">Need help?</a>
+      </div>
+      <div class="grid">
+
+        <button class="tile" type="button">
+          <span class="ico" style="background:var(--leaf-bg)">
+            <svg width="17" height="17" viewBox="0 0 20 20" fill="none" aria-hidden="true">
+              <rect x="3.6" y="4" width="12.8" height="12.4" rx="2.2" stroke="var(--leaf)" stroke-width="1.6" fill="none"/>
+              <path d="M8 4V2.6h4V4" stroke="var(--leaf)" stroke-width="1.6"/>
+              <circle cx="10" cy="10.4" r="2" stroke="var(--leaf)" stroke-width="1.6" fill="none"/>
+              <path d="M10 12.4v1.8" stroke="var(--leaf)" stroke-width="1.6" stroke-linecap="round"/>
+            </svg>
+          </span>
+          <span class="txt">
+            <b data-hi="तिजोरी">Legal Vault</b>
+            <em class="not-free" data-hi="24 दस्तावेज़ · सुरक्षित">24 documents</em>
+            <em class="only-free" data-hi="100 MB में 71 MB">71 of 100 MB</em>
+          </span>
+        </button>
+
+        <button class="tile" type="button">
+          <span class="ico" style="background:var(--card-2); border:1px solid var(--line)">
+            <svg width="17" height="17" viewBox="0 0 20 20" fill="none" aria-hidden="true">
+              <path d="M5 2.8h6.4L15.2 6.6v10.6H5V2.8z" stroke="var(--ink-2)" stroke-width="1.5" fill="none"/>
+              <path d="M11.2 2.8v4h4M7.4 10h5.2M7.4 13h3.4" stroke="var(--ink-2)" stroke-width="1.5" stroke-linecap="round"/>
+            </svg>
+          </span>
+          <span class="txt">
+            <b data-hi="दस्तावेज़ समझें">Understand a Doc</b>
+            <em data-hi="सरल हिंदी या अंग्रेज़ी">Plain Hindi or English</em>
+          </span>
+        </button>
+
+        <button class="tile" type="button">
+          <span class="ico" style="background:var(--card-2); border:1px solid var(--line)">
+            <svg width="17" height="17" viewBox="0 0 20 20" fill="none" aria-hidden="true">
+              <path d="M3.4 9.2c0-3.2 2.9-5.8 6.6-5.8s6.6 2.6 6.6 5.8-2.9 5.8-6.6 5.8c-.9 0-1.7-.1-2.5-.4L4 16l.9-2.6a5.4 5.4 0 0 1-1.5-4.2z"
+                stroke="var(--ink-2)" stroke-width="1.5" fill="none"/>
+              <path d="M7.4 9.2h5.2M7.4 6.8h3.4" stroke="var(--ink-2)" stroke-width="1.5" stroke-linecap="round"/>
+            </svg>
+          </span>
+          <span class="txt">
+            <b data-hi="सवाल पूछें">Ask a Question</b>
+            <em data-hi="जानकारी, सलाह नहीं">Information, not advice</em>
+          </span>
+        </button>
+
+        <button class="tile" type="button">
+          <span class="ico" style="background:var(--leaf-bg)">
+            <svg width="17" height="17" viewBox="0 0 20 20" fill="none" aria-hidden="true">
+              <path d="M10 2.4 3.4 5v5.6c0 4 2.7 6.7 6.6 7.6 3.9-.9 6.6-3.6 6.6-7.6V5L10 2.4z" stroke="var(--leaf)" stroke-width="1.6" fill="none"/>
+              <path d="M10 7.2v3.4M10 12.9v.2" stroke="var(--leaf)" stroke-width="1.8" stroke-linecap="round"/>
+            </svg>
+          </span>
+          <span class="txt">
+            <b data-hi="स्कैम जाँच">Scam Check</b>
+            <em class="not-free calm" data-hi="लिंक, UPI, SMS · असीमित">Unlimited checks</em>
+            <em class="only-free hot" data-hi="इस महीने 3 बाकी">3 left this month</em>
+          </span>
+        </button>
+
+        <button class="tile" type="button">
+          <svg class="seal" width="84" height="84" viewBox="0 0 92 92" fill="none" aria-hidden="true">
+            <circle cx="46" cy="46" r="44" stroke="var(--ink)" stroke-width="2"/>
+            <circle cx="46" cy="46" r="36" stroke="var(--ink)" stroke-width="1"/>
+            <path d="M46 26v40M32 36h28M33 36l-5 11h10L33 36zM59 36l-5 11h10L59 36zM36 70h20"
+              stroke="var(--ink)" stroke-width="2" stroke-linecap="round"/>
+          </svg>
+          <span class="ico" style="background:var(--brass-bg)">
+            <svg width="17" height="17" viewBox="0 0 20 20" fill="none" aria-hidden="true">
+              <path d="M10 3v11M4.6 7h10.8M5 7l-2.4 5h4.8L5 7zM15 7l-2.4 5h4.8L15 7zM6.6 16.6h6.8"
+                stroke="var(--brass)" stroke-width="1.6" stroke-linecap="round" fill="none"/>
+            </svg>
+          </span>
+          <span class="txt">
+            <b data-hi="वकील से बात">Talk to Advocate</b>
+            <em class="not-free" data-hi="इस साल 2 शेष · लेटरहेड पर">2 left · on letterhead</em>
+            <em class="only-free" data-hi="फ्री प्लान में नहीं">Not on the Free plan</em>
+          </span>
+        </button>
+
+        <button class="tile" type="button">
+          <span class="ico" style="background:var(--card-2); border:1px solid var(--line)">
+            <svg width="17" height="17" viewBox="0 0 20 20" fill="none" aria-hidden="true">
+              <circle cx="7.4" cy="7.6" r="2.6" stroke="var(--ink-2)" stroke-width="1.5" fill="none"/>
+              <circle cx="13.6" cy="8.6" r="2" stroke="var(--ink-2)" stroke-width="1.5" fill="none"/>
+              <path d="M2.8 16.4c.5-2.6 2.4-4 4.6-4s4.1 1.4 4.6 4M13 12.6c1.8.2 3.2 1.5 3.6 3.8"
+                stroke="var(--ink-2)" stroke-width="1.5" stroke-linecap="round" fill="none"/>
+            </svg>
+          </span>
+          <span class="txt">
+            <b data-hi="परिवार">Family</b>
+            <em class="not-free" data-hi="4 में 2 सदस्य जुड़े">2 of 4 members</em>
+            <em class="only-free" data-hi="फैमिली प्लान में उपलब्ध">On the Family plan</em>
+          </span>
+        </button>
+
+        <button class="tile" type="button">
+          <span class="ico" style="background:var(--card-2); border:1px solid var(--line)">
+            <svg width="17" height="17" viewBox="0 0 20 20" fill="none" aria-hidden="true">
+              <rect x="2.8" y="5" width="14.4" height="10" rx="2" stroke="var(--ink-2)" stroke-width="1.5" fill="none"/>
+              <path d="M2.8 8.4h14.4M5.6 11.8h3.6" stroke="var(--ink-2)" stroke-width="1.5" stroke-linecap="round"/>
+            </svg>
+          </span>
+          <span class="txt">
+            <b data-hi="मेरा प्लान">My Plan</b>
+            <em class="not-free" data-hi="4 मार्च 2027 को रिन्यू">Renews 4 Mar 2027</em>
+            <em class="only-free" data-hi="वेब पर प्लान देखें">See plans on web</em>
+          </span>
+        </button>
+
+        <button class="tile" type="button">
+          <span class="ico" style="background:var(--card-2); border:1px solid var(--line)">
+            <svg width="17" height="17" viewBox="0 0 20 20" fill="none" aria-hidden="true">
+              <path d="M3.4 4.4h5.2c.8 0 1.4.6 1.4 1.4v10c0-.8-.6-1.4-1.4-1.4H3.4v-10z" stroke="var(--ink-2)" stroke-width="1.5" fill="none"/>
+              <path d="M16.6 4.4h-5.2c-.8 0-1.4.6-1.4 1.4v10c0-.8.6-1.4 1.4-1.4h5.2v-10z" stroke="var(--ink-2)" stroke-width="1.5" fill="none"/>
+            </svg>
+          </span>
+          <span class="txt">
+            <b data-hi="गाइड">Guides</b>
+            <em data-hi="वकील-स्वीकृत जवाब">Advocate-approved</em>
+          </span>
+        </button>
+      </div>
+
+      <!-- dated things -->
+      <div class="alerts">
+        <button class="alert" type="button">
+          <span class="days soon" data-hi="12 दिन">12d</span>
+          <span class="txt">
+            <b data-hi="इंश्योरेंस पॉलिसी समाप्त हो रही है">Insurance policy expires</b>
+            <em data-hi="स्टार हेल्थ · ₹5 लाख · 23 सित 2026">Star Health · ₹5L cover · 23 Sep 2026</em>
+          </span>
+          <span class="go" data-hi="रिन्यू करें">Renew</span>
+        </button>
+        <button class="alert" type="button">
+          <span class="days later" data-hi="45 दिन">45d</span>
+          <span class="txt">
+            <b data-hi="वाहन RC रिन्यूअल">Vehicle RC renewal</b>
+            <em data-hi="MP09 CD 4417 · 26 अक्तू 2026">MP09 CD 4417 · 26 Oct 2026</em>
+          </span>
+          <span class="go" data-hi="कदम देखें">Steps</span>
+        </button>
+      </div>
+
+      <nav class="nav" aria-label="Main">
+        <button type="button" aria-current="page">
+          <svg width="20" height="20" viewBox="0 0 22 22" fill="none" aria-hidden="true">
+            <path d="M3.6 9 11 3.4 18.4 9v8.6H3.6V9z" stroke="currentColor" stroke-width="1.7" fill="none" stroke-linejoin="round"/>
+            <path d="M8.8 17.6v-5h4.4v5" stroke="currentColor" stroke-width="1.7" fill="none"/>
+          </svg>
+          <span data-hi="होम">Home</span><span class="bar"></span>
+        </button>
+        <button type="button">
+          <svg width="20" height="20" viewBox="0 0 22 22" fill="none" aria-hidden="true">
+            <rect x="4" y="4.4" width="14" height="13.6" rx="2.4" stroke="currentColor" stroke-width="1.7" fill="none"/>
+            <circle cx="11" cy="11.2" r="2.2" stroke="currentColor" stroke-width="1.7" fill="none"/>
+            <path d="M11 13.4v2" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/>
+          </svg>
+          <span data-hi="तिजोरी">Vault</span><span class="bar"></span>
+        </button>
+        <button type="button">
+          <svg width="20" height="20" viewBox="0 0 22 22" fill="none" aria-hidden="true">
+            <path d="M3.8 10.2c0-3.5 3.2-6.4 7.2-6.4s7.2 2.9 7.2 6.4-3.2 6.4-7.2 6.4c-1 0-2-.2-2.8-.5l-3.8 1.3 1-3a6 6 0 0 1-1.6-4.2z"
+              stroke="currentColor" stroke-width="1.7" fill="none"/>
+          </svg>
+          <span data-hi="सहायक">Assistant</span><span class="bar"></span>
+        </button>
+        <button type="button">
+          <svg width="20" height="20" viewBox="0 0 22 22" fill="none" aria-hidden="true">
+            <path d="M11 3 4.4 5.6v5.8c0 4.2 2.8 7 6.6 7.9 3.8-.9 6.6-3.7 6.6-7.9V5.6L11 3z" stroke="currentColor" stroke-width="1.7" fill="none"/>
+            <path d="m8.4 11 2.2 2.2 3.2-3.8" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" fill="none"/>
+          </svg>
+          <span data-hi="साइबर">Shield</span><span class="bar"></span>
+        </button>
+        <button type="button">
+          <svg width="20" height="20" viewBox="0 0 22 22" fill="none" aria-hidden="true">
+            <circle cx="5.4" cy="11" r="1.6" fill="currentColor"/>
+            <circle cx="11" cy="11" r="1.6" fill="currentColor"/>
+            <circle cx="16.6" cy="11" r="1.6" fill="currentColor"/>
+          </svg>
+          <span data-hi="और">More</span><span class="bar"></span>
+        </button>
+      </nav>
+
+    </div>
+  </div>
+  </div>
+  </div>
+
+</div>
+
+<script>
+(function(){
+  var phone = document.getElementById('phone');
+
+  /* language — swaps only inside the phone */
+  document.querySelectorAll('.lang button').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      var hi = btn.dataset.lang === 'hi';
+      document.querySelectorAll('.lang button').forEach(function(b){
+        b.setAttribute('aria-pressed', String(b === btn));
+      });
+      phone.querySelectorAll('[data-hi]').forEach(function(el){
+        if(!el.dataset.en) el.dataset.en = el.innerHTML;
+        el.innerHTML = hi ? el.dataset.hi : el.dataset.en;
+      });
+      phone.lang = hi ? 'hi' : 'en';
+    });
+  });
+
+  /* state */
+  document.querySelectorAll('[data-set-state]').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      document.querySelectorAll('[data-set-state]').forEach(function(b){
+        b.setAttribute('aria-pressed', String(b === btn));
+      });
+      phone.dataset.state = btn.dataset.setState;
+    });
+  });
+
+  /* RBI window countdown */
+  var out = document.getElementById('countdown');
+  var deadline = Date.now() + ((3 * 24 + 9) * 60 + 11) * 60000 + 42000;
+  function pad(n){ return n < 10 ? '0' + n : '' + n; }
+  function tick(){
+    var s = Math.floor(Math.max(0, deadline - Date.now()) / 1000);
+    out.textContent = Math.floor(s / 86400) + 'd ' + pad(Math.floor(s % 86400 / 3600)) +
+                      'h ' + pad(Math.floor(s % 3600 / 60)) + 'm ' + pad(s % 60) + 's';
+  }
+  tick();
+  setInterval(tick, 1000);
+})();
+</script>

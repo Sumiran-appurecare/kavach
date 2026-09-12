@@ -1,0 +1,33 @@
+{
+  "expo": {
+    "name": "Nyaya Kavach",
+    "slug": "nyaya-kavach",
+    "version": "0.1.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "scheme": "nyayakavach",
+    "userInterfaceStyle": "automatic",
+    "backgroundColor": "#F5F2E8",
+    "ios": {
+      "supportsTablet": false,
+      "bundleIdentifier": "com.nyayakavach.app"
+    },
+    "android": {
+      "package": "com.nyayakavach.app",
+      "adaptiveIcon": {
+        "backgroundColor": "#123D2F",
+        "foregroundImage": "./assets/android-icon-foreground.png",
+        "backgroundImage": "./assets/android-icon-background.png",
+        "monochromeImage": "./assets/android-icon-monochrome.png"
+      },
+      "predictiveBackGestureEnabled": false
+    },
+    "web": {
+      "favicon": "./assets/favicon.png",
+      "bundler": "metro"
+    },
+    "plugins": [
+      "expo-font"
+    ]
+  }
+}

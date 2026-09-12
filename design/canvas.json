@@ -1,0 +1,60 @@
+{
+  "artboards": [
+    {
+      "file": "Main.dc.html",
+      "x": 0,
+      "y": 0,
+      "w": 390,
+      "h": 844,
+      "title": "Home — case open"
+    },
+    {
+      "file": "QuietDay.dc.html",
+      "x": 510,
+      "y": 0,
+      "w": 390,
+      "h": 844,
+      "title": "Home — quiet day"
+    }
+  ],
+  "annotations": [
+    {
+      "id": "note-layout",
+      "x": -350,
+      "y": 0,
+      "w": 300,
+      "text": "THE EMERGENCY BLOCK\n\nIt now carries an EMERGENCY ALERT badge with a blinking dot, a proper siren icon, and a beacon ring that swells out from behind it. It is the only red on the screen and the only thing that moves, so in a panic the eye lands here first.\n\nBoth animations stop when the phone asks for reduced motion — an accessibility setting, and the scope asks for TalkBack and dynamic type support anyway (NFR-18)."
+    },
+    {
+      "id": "note-case",
+      "x": -350,
+      "y": 420,
+      "w": 300,
+      "text": "THE CASE CARD\n\nYour '3/5 done' is a segmented bar — one block per milestone, so a user can count what is left instead of guessing at a percentage. The five are: case opened, bank reported, 1930 reported, evidence pack, written complaint.\n\nThe status line is live: it names the next pending step rather than always saying 'follow-up pending'. Right now that is the 1930 report, which is the one that decides zero liability.\n\nThe second artboard is the same screen with no case open."
+    },
+    {
+      "id": "note-safety",
+      "x": 1030,
+      "y": 0,
+      "w": 300,
+      "text": "YOUR LEGAL PROTECTION\n\nThe Safety Center card is gone; this standing status row took its place, squeezed down to about 84px so the screen keeps a clear margin at every height.\n\nEvery value is read off real state: documents in the vault, when the next insurance and vehicle papers run out, consultations left. The tick only stays blue while that is genuinely true — a date inside two weeks turns amber, a lapsed one turns red. Right now it is telling you the PUC has lapsed.\n\nTHE BLINK\n\nEach of the four symbols blinks twice and swells as it goes — off hard, back, off softer, back. One blink alone reads as a rendering glitch; two read as a signal. They fire left to right off one shared 2.6s loop, a quarter second apart, so the eye is walked across the row rather than pulled four ways at once.\n\nThe amber and red badges blink deeper and swell further than the blue ones, so the row can be understood without being read.\n\nThe blink costs no pixels, which is the point: the swell is capped at 1.34× and the halo at 1.45× — about 4.5px on a 20px badge — so it stays inside the gaps and never reaches a neighbour.\n\nEverything here stops when the phone asks for reduced motion."
+    },
+    {
+      "id": "note-insurance",
+      "x": 1030,
+      "y": 340,
+      "w": 300,
+      "text": "INSURANCE & CLAIMS — a scope addition\n\nThis one is NOT in Product Scope v1, so per the document's own rule it needs a change request before it is built for real.\n\nI have kept it honest in the meantime: it reads the claim-deciding fields that Document Intelligence already pulls out of a policy — room-rent cap, co-pay, waiting period, sum insured — and routes to an advocate when a claim has actually been refused. It does not file or pursue a claim on the user's behalf, and the screen says so."
+    },
+    {
+      "id": "note-fit",
+      "x": 1030,
+      "y": 640,
+      "w": 300,
+      "text": "NOTHING OVERLAPS ANY MORE\n\nThe old layout was tuned to one device height, so on a shorter window the bottom of the screen collided with itself.\n\nNow the body measures the height it was actually given and picks one of two layouts: full, or compact — which trims the protection row, its badges and its subtitle rather than moving anything. Detail is what gives way, never position.\n\nThe two motions on the screen are inside their own boxes by design: the emergency beacon is clipped to its card, and the protection badges halo by 4px into gaps that are 6 to 7px wide.\n\nThese two artboards are both the full layout at 390 × 844."
+    }
+  ],
+  "launch": {
+    "view": "canvas"
+  }
+}

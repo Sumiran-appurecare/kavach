@@ -66,6 +66,10 @@ export type Palette = {
   tileTealBg: string;
   tilePurple: string;
   tilePurpleBg: string;
+  tileRust: string;
+  tileRustBg: string;
+  tileSlate: string;
+  tileSlateBg: string;
 
   shadow: string;
 };
@@ -75,10 +79,10 @@ export const light: Palette = {
   card: '#FFFFFF',
   card2: '#F6F9FC',
 
-  forest: '#2F66A6',
-  forest2: '#3A78BC',
-  forest3: '#1E4A80',
-  scanner: '#1B4374',
+  forest: '#16325C',
+  forest2: '#1F4478',
+  forest3: '#0D2142',
+  scanner: '#12294A',
   onForest: '#FFFFFF',
   onForestDim: '#A8C3DE',
   onForestLine: 'rgba(255,255,255,0.22)',
@@ -115,6 +119,10 @@ export const light: Palette = {
   tileTealBg: '#E4F4F6',
   tilePurple: '#8B5CF6',
   tilePurpleBg: '#F2EBFC',
+  tileRust: '#C2410C',
+  tileRustBg: '#FDEDE4',
+  tileSlate: '#475569',
+  tileSlateBg: '#ECF1F6',
 
   shadow: '#0F2A4A',
 };
@@ -124,10 +132,10 @@ export const dark: Palette = {
   card: '#0E1B2D',
   card2: '#132338',
 
-  forest: '#1E4A80',
-  forest2: '#2A5F9E',
-  forest3: '#163659',
-  scanner: '#122F51',
+  forest: '#122A4C',
+  forest2: '#1B3B66',
+  forest3: '#0A1A33',
+  scanner: '#0F2340',
   onForest: '#FFFFFF',
   onForestDim: '#8FAAC6',
   onForestLine: 'rgba(255,255,255,0.18)',
@@ -164,6 +172,10 @@ export const dark: Palette = {
   tileTealBg: '#11302F',
   tilePurple: '#C084FC',
   tilePurpleBg: '#271E3F',
+  tileRust: '#FB923C',
+  tileRustBg: '#33210F',
+  tileSlate: '#94A3B8',
+  tileSlateBg: '#1C2735',
 
   shadow: '#000000',
 };

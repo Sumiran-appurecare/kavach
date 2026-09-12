@@ -68,29 +68,6 @@ export const USER = {
 
 export const VAULT_DOCS: VaultDoc[] = [
   {
-    id: 'd1',
-    title: { en: 'Health insurance policy', hi: 'हेल्थ इंश्योरेंस पॉलिसी' },
-    category: 'insurance',
-    expiryDate: iso(12),
-    addedAt: iso(-231),
-    sizeKb: 1840,
-    ocrStatus: 'done',
-    fields: [
-      { label: { en: 'Insurer', hi: 'बीमा कंपनी' }, value: 'Star Health' },
-      { label: { en: 'Policy number', hi: 'पॉलिसी नंबर' }, value: 'SH/FHO/2024/887412', mono: true },
-      { label: { en: 'Sum insured', hi: 'बीमित राशि' }, value: '₹5,00,000' },
-      { label: { en: 'Premium', hi: 'प्रीमियम' }, value: '₹18,400 / year' },
-      { label: { en: 'Room rent cap', hi: 'रूम रेंट सीमा' }, value: '1% of sum insured / day' },
-      { label: { en: 'Co-pay', hi: 'को-पे' }, value: '20% above age 61' },
-      { label: { en: 'Waiting period', hi: 'प्रतीक्षा अवधि' }, value: '36 months, listed conditions' },
-      { label: { en: 'Nominee', hi: 'नॉमिनी' }, value: 'Sunita Rajput' },
-    ],
-    explanation: {
-      en: 'This is a family floater health policy for ₹5,00,000, shared across everyone named on it. Two limits shape what a hospital bill actually pays out: the room-rent cap of 1% of the sum insured a day, and a 20% co-pay that applies to anyone over 61 named on the policy. A room above the cap generally reduces the whole claim proportionally, not just the room charge. The listed conditions carry a 36-month waiting period from the first policy start date.',
-      hi: 'यह ₹5,00,000 की फैमिली फ्लोटर हेल्थ पॉलिसी है, जो इसमें दर्ज सभी लोगों के बीच साझा है। अस्पताल के बिल में असल भुगतान दो सीमाएँ तय करती हैं: प्रतिदिन बीमित राशि के 1% की रूम-रेंट सीमा, और पॉलिसी में दर्ज 61 वर्ष से ऊपर के किसी भी व्यक्ति पर लागू 20% को-पे। सीमा से ऊँचा कमरा लेने पर आम तौर पर पूरा क्लेम अनुपात में घट जाता है, सिर्फ़ कमरे का शुल्क नहीं। दर्ज बीमारियों पर पहली पॉलिसी शुरू होने की तारीख़ से 36 महीने की प्रतीक्षा अवधि लगती है।',
-    },
-  },
-  {
     id: 'd2',
     title: { en: 'PUC certificate', hi: 'PUC सर्टिफिकेट' },
     category: 'vehicle',
@@ -121,7 +98,7 @@ export const VAULT_DOCS: VaultDoc[] = [
   {
     id: 'd4',
     title: { en: 'Motor insurance', hi: 'मोटर इंश्योरेंस' },
-    category: 'vehicle',
+    category: 'insurance',
     expiryDate: iso(30),
     addedAt: iso(-335),
     sizeKb: 980,

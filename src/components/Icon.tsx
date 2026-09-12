@@ -126,6 +126,19 @@ const P: Record<string, Stroke[]> = {
   folder: [
     { d: 'M3 6.2a1.6 1.6 0 0 1 1.6-1.6h3l1.6 2h6.2A1.6 1.6 0 0 1 17 8.2v6.6a1.6 1.6 0 0 1-1.6 1.6H4.6A1.6 1.6 0 0 1 3 14.8V6.2z' },
   ],
+  /** Vehicle papers: the side of a car, so PUC and RC read at a glance. */
+  car: [
+    { d: 'M3 11.6h14v2.8H3v-2.8z' },
+    { d: 'M5 11.6 6.3 7.6a1.5 1.5 0 0 1 1.4-1h4.6a1.5 1.5 0 0 1 1.4 1l1.3 4' },
+    { d: 'M6.6 16.2a1.6 1.6 0 1 1 0-3.2 1.6 1.6 0 0 1 0 3.2z' },
+    { d: 'M13.4 16.2a1.6 1.6 0 1 1 0-3.2 1.6 1.6 0 0 1 0 3.2z' },
+  ],
+  /** Evidence locker: a sealed folder. Things go in; nothing comes back out. */
+  evidence: [
+    { d: 'M3 6.2a1.6 1.6 0 0 1 1.6-1.6h3l1.6 2h6.2A1.6 1.6 0 0 1 17 8.2v6.6a1.6 1.6 0 0 1-1.6 1.6H4.6A1.6 1.6 0 0 1 3 14.8V6.2z' },
+    { d: 'M8.5 12.2v-1.1a1.5 1.5 0 0 1 3 0v1.1' },
+    { d: 'M7.9 12.2h4.2v2.5H7.9v-2.5z' },
+  ],
   /** Insurance cover: the shield, with the plus that reads as health. */
   cover: [
     { d: 'M10 2.4 3.4 5v5.6c0 4 2.7 6.7 6.6 7.6 3.9-.9 6.6-3.6 6.6-7.6V5L10 2.4z' },

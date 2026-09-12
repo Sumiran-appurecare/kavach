@@ -55,7 +55,7 @@ grid gives the pixels back instead of producing a scrollbar. On a screen shorter
 than 720dp the alerts strip drops to one row rather than squeezing the features.
 
 Each feature appears **exactly once**. The reference mockups showed Legal Vault /
-My Documents, Scam Check / Cyber Shield and AI Assistant twice each; on a
+My Documents, Scan for Scam / Cyber Shield and AI Assistant twice each; on a
 no-scroll screen that is wasted height, and it makes a user wonder whether two
 tiles do two different things.
 
@@ -107,7 +107,7 @@ regression suite that blocks release on failure.
 
 **Real, running locally:**
 
-- **Scam Check** (`src/data/engine.ts`) scores pasted artefacts on genuine
+- **Scan for Scam** (`src/data/engine.ts`) scores pasted artefacts on genuine
   signals — link shorteners, plain http, brand names on non-official domains,
   cheap TLDs, bare IPs, login/KYC/refund paths, UPI handles dressed up as support
   accounts, international callers claiming to be Indian banks, credential asks,

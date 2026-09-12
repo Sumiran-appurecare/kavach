@@ -75,6 +75,18 @@ export function ServicesScreen() {
             onPress={() => nav.navigate('Insurance')}
           />
           <ListRow
+            icon="car"
+            title={t('f.vehicle')}
+            sub={t('f.vehicle.sub')}
+            onPress={() => nav.navigate('Vault')}
+          />
+          <ListRow
+            icon="evidence"
+            title={t('f.evidence')}
+            sub={t('f.evidence.desc')}
+            onPress={() => nav.navigate('Cases')}
+          />
+          <ListRow
             icon="alert"
             iconTone="siren"
             title={t('emg.screen.title')}

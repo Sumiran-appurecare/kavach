@@ -5,16 +5,16 @@
       "x": 0,
       "y": 0,
       "w": 390,
-      "h": 844,
-      "title": "Home — case open"
+      "h": 1238,
+      "title": "Home — case open (scrolls)"
     },
     {
       "file": "QuietDay.dc.html",
-      "x": 510,
+      "x": 520,
       "y": 0,
       "w": 390,
-      "h": 844,
-      "title": "Home — quiet day"
+      "h": 1156,
+      "title": "Home — quiet day (scrolls)"
     }
   ],
   "annotations": [
@@ -23,35 +23,21 @@
       "x": -350,
       "y": 0,
       "w": 300,
-      "text": "THE EMERGENCY BLOCK\n\nIt now carries an EMERGENCY ALERT badge with a blinking dot, a proper siren icon, and a beacon ring that swells out from behind it. It is the only red on the screen and the only thing that moves, so in a panic the eye lands here first.\n\nBoth animations stop when the phone asks for reduced motion — an accessibility setting, and the scope asks for TalkBack and dynamic type support anyway (NFR-18)."
-    },
-    {
-      "id": "note-case",
-      "x": -350,
-      "y": 420,
-      "w": 300,
-      "text": "THE CASE CARD\n\nYour '3/5 done' is a segmented bar — one block per milestone, so a user can count what is left instead of guessing at a percentage. The five are: case opened, bank reported, 1930 reported, evidence pack, written complaint.\n\nThe status line is live: it names the next pending step rather than always saying 'follow-up pending'. Right now that is the 1930 report, which is the one that decides zero liability.\n\nThe second artboard is the same screen with no case open."
-    },
-    {
-      "id": "note-safety",
-      "x": 1030,
-      "y": 0,
-      "w": 300,
-      "text": "YOUR LEGAL PROTECTION\n\nThe Safety Center card is gone; this standing status row took its place, squeezed down to about 84px so the screen keeps a clear margin at every height.\n\nEvery value is read off real state: documents in the vault, when the next insurance and vehicle papers run out, consultations left. The tick only stays blue while that is genuinely true — a date inside two weeks turns amber, a lapsed one turns red. Right now it is telling you the PUC has lapsed.\n\nTHE BLINK\n\nEach of the four symbols blinks twice and swells as it goes — off hard, back, off softer, back. One blink alone reads as a rendering glitch; two read as a signal. They fire left to right off one shared 2.6s loop, a quarter second apart, so the eye is walked across the row rather than pulled four ways at once.\n\nThe amber and red badges blink deeper and swell further than the blue ones, so the row can be understood without being read.\n\nThe blink costs no pixels, which is the point: the swell is capped at 1.34× and the halo at 1.45× — about 4.5px on a 20px badge — so it stays inside the gaps and never reaches a neighbour.\n\nEverything here stops when the phone asks for reduced motion."
-    },
-    {
-      "id": "note-insurance",
-      "x": 1030,
-      "y": 340,
-      "w": 300,
-      "text": "INSURANCE & CLAIMS — a scope addition\n\nThis one is NOT in Product Scope v1, so per the document's own rule it needs a change request before it is built for real.\n\nI have kept it honest in the meantime: it reads the claim-deciding fields that Document Intelligence already pulls out of a policy — room-rent cap, co-pay, waiting period, sum insured — and routes to an advocate when a claim has actually been refused. It does not file or pursue a claim on the user's behalf, and the screen says so."
+      "text": "IT SCROLLS NOW\n\nThese frames are the whole page, not one viewport. On a phone you see the header, the dial and the first services; everything below arrives on a swipe. The tab bar sits outside the scroll, so it never moves.\n\nTHE DIAL, AT THE TOP\n\nIt is the first thing on the page, so it is the first thing a thumb finds, and the logo is blurred into the red behind it — a real gaussian blur, not a dimmed copy, because a logo at low opacity keeps its hard edges and reads as a second weaker logo rather than as depth.\n\nThree things move on one 1.5s beat: the dial pops, a beacon swells out from behind it, the dot beside EMERGENCY blinks. The beacon is capped at 1.19x inside a fixed square, so it never touches a tile. All of it stops under reduced motion (NFR-18).\n\nONE THING TO DECIDE: because the page scrolls, the dial can scroll out of sight. For the one button someone reaches for in a panic that is worth fixing — a small red pill that sticks to the bottom once the dial leaves the screen. Say the word and I will add it."
     },
     {
       "id": "note-fit",
-      "x": 1030,
-      "y": 640,
+      "x": 1040,
+      "y": 0,
       "w": 300,
-      "text": "NOTHING OVERLAPS ANY MORE\n\nThe old layout was tuned to one device height, so on a shorter window the bottom of the screen collided with itself.\n\nNow the body measures the height it was actually given and picks one of two layouts: full, or compact — which trims the protection row, its badges and its subtitle rather than moving anything. Detail is what gives way, never position.\n\nThe two motions on the screen are inside their own boxes by design: the emergency beacon is clipped to its card, and the protection badges halo by 4px into gaps that are 6 to 7px wide.\n\nThese two artboards are both the full layout at 390 × 844."
+      "text": "WHAT THE PAGE HOLDS NOW, IN ORDER\n\n1. The emergency dial, with the OTP warning welded under it\n2. My Active Case, when one is open (left board only)\n3. All eight services, 2 x 4\n4. Upcoming\n5. Connect DigiLocker\n6. The two closing offers\n\nUPCOMING is the only section ordered by time rather than by importance, which is the point: a renewal date does not care how important the paper is. Every row is a real vault document, soonest first, and the chip turns red once the date has passed.\n\nThe health insurance policy has been removed from the vault. Motor insurance moved into the insurance category with it — it genuinely is a policy, and without it Insurance & Claims would have had nothing left to read."
+    },
+    {
+      "id": "note-scope",
+      "x": 1040,
+      "y": 420,
+      "w": 300,
+      "text": "TWO THINGS THAT ARE NOT IN SCOPE V1\n\nCONNECT DIGILOCKER and GET A DRAFT are both new. Per the scope document's own rule they need a change request before either is built for real, so neither pretends to work: DigiLocker opens the vault rather than holding a government session it does not have, and Get a Draft opens a consultation.\n\nBoth closing offers end at an advocate on purpose. Drafting a will or a legal notice is advocate work, and the compliance rules are explicit that the assistant gives information rather than advice (FR-AIA-02/03). They are two doors into the same room at the moment — tell me if you want the drafting one to become its own flow."
     }
   ],
   "launch": {

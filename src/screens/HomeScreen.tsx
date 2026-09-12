@@ -4,15 +4,15 @@ import {
   AccessibilityInfo,
   Animated,
   Easing,
-  LayoutChangeEvent,
-  Platform,
   Pressable,
+  ScrollView,
   Text,
+  useWindowDimensions,
   View,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Icon, IconName } from '../components/Icon';
-import { Logo } from '../components/Logo';
+import { Logo, LogoBlur } from '../components/Logo';
 import { ThemedStatusBar } from '../components/ui';
 import { daysUntil, USER } from '../data/mock';
 import { rupees, useLang } from '../i18n/LanguageProvider';
@@ -23,14 +23,13 @@ import { useTheme } from '../theme/ThemeProvider';
 import { font, radius, space } from '../theme/tokens';
 
 /**
- * Nothing on this screen is sized for one device. The body measures the height
- * it was actually handed and picks the richest layout that fits inside it, so
- * a short window loses detail instead of overlapping.
+ * The home screen scrolls, so the layout no longer has to fight to fit and
+ * the old measure-then-degrade machinery is gone with it.
  *
- * These are the heights each layout needs, measured against the real content.
+ * Mode is now only about density: a small phone still wants more on screen
+ * per swipe, a tall one can breathe.
  */
-const NEEDS = { full: 526, compact: 478 };
-const CASE_BLOCK = 126;
+const COMPACT_BELOW = 720;
 
 type Mode = 'full' | 'compact';
 
@@ -55,20 +54,37 @@ export function HomeScreen() {
   const nav = useNavigation<Nav>();
   const { plan, profile, fraudCase, docs, consultsLeft, scamChecksLeft } = useApp();
 
-  const [bodyH, setBodyH] = useState(0);
-  const onBodyLayout = (e: LayoutChangeEvent) => {
-    const h = Math.round(e.nativeEvent.layout.height);
-    setBodyH((prev) => (Math.abs(prev - h) > 1 ? h : prev));
-  };
-
-  const extra = fraudCase ? CASE_BLOCK : 0;
-  const mode: Mode = bodyH === 0 || bodyH >= NEEDS.full + extra ? 'full' : 'compact';
+  const { height: winH } = useWindowDimensions();
+  const mode: Mode = winH < COMPACT_BELOW ? 'compact' : 'full';
 
   const free = plan === 'FREE';
   const firstName = lang === 'hi' ? USER.firstName.hi : profile.name.split(' ')[0];
   const hour = new Date().getHours();
   const greetingKey: StringKey =
     hour < 12 ? 'home.greeting.morning' : hour < 17 ? 'home.greeting.afternoon' : 'home.greeting.evening';
+
+  /**
+   * Vehicle Expiry and Evidence Locker both report real state, not a label.
+   * The vehicle tile is the reason the PUC lapse is still visible anywhere on
+   * this screen — it used to live in the protection row.
+   */
+  const vehicleDoc = docs
+    .filter((d) => d.category === 'vehicle' && d.expiryDate)
+    .sort((a, b) => daysUntil(a.expiryDate!) - daysUntil(b.expiryDate!))[0];
+  const vehicleDays = vehicleDoc?.expiryDate ? daysUntil(vehicleDoc.expiryDate) : null;
+  const vehicleLate = vehicleDays !== null && vehicleDays < 0;
+  const vehicleDesc =
+    vehicleDays === null
+      ? t('f.vehicle.none')
+      : vehicleLate
+        ? t('f.vehicle.expired')
+        : lang === 'hi'
+          ? `${vehicleDays} दिन में`
+          : `In ${vehicleDays} days`;
+
+  const evidenceCount = fraudCase?.evidence.length ?? 0;
+  const evidenceDesc =
+    evidenceCount > 0 ? `${evidenceCount} ${t('f.evidence.items')}` : t('f.evidence.desc');
 
   return (
     <View style={{ flex: 1, backgroundColor: c.paper }}>
@@ -82,7 +98,7 @@ export function HomeScreen() {
           borderBottomRightRadius: radius.xl + 4,
           paddingTop: insets.top + space.md,
           paddingHorizontal: space.lg + 2,
-          paddingBottom: space.xl + 6,
+          paddingBottom: space.md + 4,
           gap: space.md - 2,
         }}
       >
@@ -113,20 +129,72 @@ export function HomeScreen() {
         </View>
       </View>
 
-      {/* ══ body ══ */}
-      <View
-        onLayout={onBodyLayout}
-        style={{ flex: 1, paddingHorizontal: space.lg, gap: mode === 'compact' ? 7 : 9 }}
+      {/*
+        ══ body ══
+        It scrolls now. The tab bar is outside this, so it stays put.
+      */}
+      <ScrollView
+        style={{ flex: 1 }}
+        contentContainerStyle={{
+          paddingHorizontal: space.lg,
+          paddingTop: mode === 'compact' ? 8 : 10,
+          paddingBottom: space.xl,
+          gap: mode === 'compact' ? 9 : 11,
+        }}
+        showsVerticalScrollIndicator={false}
       >
-        <EmergencyBlock mode={mode} />
+        {/*
+          The mark lies on the paper behind the dial — big, navy and soft —
+          so the band around the button is brand rather than blank. The dial
+          paints over the middle of it, which leaves a halo of shield showing
+          around the red. It is absolutely positioned, so it can wash the
+          background without ever pushing a single pixel of layout.
+        */}
+        <View
+          style={{
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: mode === 'compact' ? 5 : 6,
+          }}
+        >
+          <View
+            pointerEvents="none"
+            style={{
+              position: 'absolute',
+              left: 0,
+              right: 0,
+              top: 0,
+              bottom: 0,
+              alignItems: 'center',
+              justifyContent: 'center',
+            }}
+          >
+            <LogoBlur
+              size={mode === 'compact' ? 186 : 216}
+              color={c.forest}
+              layers={6}
+              spread={0.05}
+              step={0.035}
+            />
+          </View>
 
-        <SectionRow
-          title={t('home.help')}
-          action={t('home.quickAccess')}
-          onAction={() => nav.navigate('Services')}
-        />
+          <EmergencyDial mode={mode} />
+          <OtpNotice />
+        </View>
+
+        {fraudCase ? (
+          <View style={{ gap: mode === 'compact' ? 6 : space.sm }}>
+            <SectionRow title={t('home.myActiveCase')} />
+            <ActiveCaseCard mode={mode} />
+          </View>
+        ) : null}
 
         <View style={{ gap: mode === 'compact' ? 6 : space.sm }}>
+          <SectionRow
+            title={t('home.help')}
+            action={t('home.quickAccess')}
+            onAction={() => nav.navigate('Services')}
+          />
           <View style={{ flexDirection: 'row', gap: space.sm }}>
             <Tile
               icon="shieldCheck"
@@ -187,18 +255,33 @@ export function HomeScreen() {
               onPress={() => nav.navigate('Insurance')}
             />
           </View>
+          <View style={{ flexDirection: 'row', gap: space.sm }}>
+            <Tile
+              icon="car"
+              tint={c.tileRust}
+              bg={c.tileRustBg}
+              title={t('f.vehicle')}
+              desc={vehicleDesc}
+              descTint={vehicleLate ? c.siren : undefined}
+              mode={mode}
+              onPress={() => nav.navigate('Vault')}
+            />
+            <Tile
+              icon="evidence"
+              tint={c.tileSlate}
+              bg={c.tileSlateBg}
+              title={t('f.evidence')}
+              desc={evidenceDesc}
+              mode={mode}
+              onPress={() => nav.navigate(fraudCase ? 'FraudCase' : 'Cases')}
+            />
+          </View>
         </View>
 
-        <View style={{ flex: 1, justifyContent: 'flex-end', gap: space.sm, paddingBottom: 6 }}>
-          {fraudCase ? (
-            <>
-              <SectionRow title={t('home.myActiveCase')} />
-              <ActiveCaseCard mode={mode} />
-            </>
-          ) : null}
-          <LegalProtection mode={mode} />
-        </View>
-      </View>
+        <UpcomingSection mode={mode} />
+        <DigiLockerCard />
+        <PromoCards mode={mode} />
+      </ScrollView>
     </View>
   );
 }
@@ -209,10 +292,10 @@ function SectionRow({ title, action, onAction }: { title: string; action?: strin
   const { c } = useTheme();
   return (
     <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: space.md }}>
-      <Text style={{ fontFamily: font.bold, fontSize: 14, lineHeight: 18, color: c.ink }}>{title}</Text>
+      <Text style={{ fontFamily: font.bold, fontSize: 12.5, lineHeight: 16, color: c.ink }}>{title}</Text>
       {action ? (
         <Pressable onPress={onAction} hitSlop={8} style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
-          <Text style={{ fontFamily: font.semibold, fontSize: 11.5, color: c.accent }}>{action}</Text>
+          <Text style={{ fontFamily: font.semibold, fontSize: 11, color: c.accent }}>{action}</Text>
           <Icon name="arrowRight" size={12} color={c.accent} strokeWidth={2} />
         </Pressable>
       ) : null}
@@ -394,169 +477,160 @@ function usePulse() {
 
   return { value, running: allowed };
 }
-
 /**
- * The emergency block: the only red on the screen, and the only thing that
- * moves. A beacon ring swells out from behind the siren and the dot on the
- * ALERT badge blinks, so the eye lands here first when someone is panicking.
+ * The emergency dial, and the reason it is a circle in the middle of the grid.
+ *
+ * Someone who has just lost money is not reading the screen top to bottom;
+ * their thumb is already resting near the centre. A circle is the shape that
+ * says "press me" without a label, it can be hit without aiming, and it is
+ * the only round thing on a screen of rectangles — so it cannot be mistaken
+ * for one more service.
+ *
+ * It is also the only red on the screen and the only thing that moves: the
+ * dial pops, a beacon swells out from behind it, and the dot on the label
+ * blinks. All of it stops when the phone asks for reduced motion (NFR-18).
  */
-function EmergencyBlock({ mode }: { mode: Mode }) {
+function EmergencyDial({ mode }: { mode: Mode }) {
   const { c } = useTheme();
   const { t } = useLang();
   const nav = useNavigation<Nav>();
-  const { plan, fraudCase } = useApp();
-  const free = plan === 'FREE';
-  const tight = mode === 'compact';
-
+  const { fraudCase } = useApp();
   const { value, running } = usePulse();
 
-  const ringStyle = {
-    opacity: value.interpolate({ inputRange: [0, 1], outputRange: [0.5, 0] }),
-    transform: [{ scale: value.interpolate({ inputRange: [0, 1], outputRange: [1, 1.8] }) }],
+  const size = mode === 'compact' ? 100 : 116;
+
+  const beacon = {
+    opacity: value.interpolate({ inputRange: [0, 1], outputRange: [0.45, 0] }),
+    transform: [{ scale: value.interpolate({ inputRange: [0, 1], outputRange: [1, 1.19] }) }],
   };
-  const dotStyle = running
+  const blink = running
     ? { opacity: value.interpolate({ inputRange: [0, 0.5, 1], outputRange: [1, 0.15, 1] }) }
     : { opacity: 1 };
+  /**
+   * The pop is capped at 1.05 — about 3px of growth on each side, which fits
+   * inside the box the beacon already reserves. Loud to the eye, invisible to
+   * the layout, so it can never shove a tile.
+   */
+  const pop = running
+    ? { transform: [{ scale: value.interpolate({ inputRange: [0, 0.6, 1], outputRange: [1, 1.05, 1] }) }] }
+    : {};
 
-  const title = fraudCase ? t('case.reportTo1930') : t('emg.titleShort');
-  const body = fraudCase ? t('case.zeroLiability') : free ? t('emg.sub.free') : t('emg.bodyShort');
-  const cta = fraudCase ? t('case.call') : free ? t('emg.cta.free') : t('emg.cta.paid');
+  const sub = fraudCase ? t('emg.dialCase') : t('emg.dialTap');
+  const box = Math.round(size * 1.19);
 
   return (
-    <View
-      style={{
-        marginTop: -18,
-        borderRadius: radius.xl - 2,
-        overflow: 'hidden',
-        borderWidth: 4,
-        borderColor: 'rgba(255,255,255,0.6)',
-        shadowColor: c.sirenDeep,
-        shadowOpacity: 0.38,
-        shadowRadius: 16,
-        shadowOffset: { width: 0, height: 9 },
-        elevation: 10,
-      }}
-    >
-      <Pressable
-        onPress={() => nav.navigate('Emergency')}
-        accessibilityRole="button"
-        accessibilityLabel={`${t('emg.alertLabel')}. ${title}. ${cta}`}
-        style={({ pressed }) => ({
-          backgroundColor: c.siren,
-          paddingHorizontal: space.md + 2,
-          paddingTop: tight ? space.sm + 2 : space.md,
-          paddingBottom: tight ? space.sm : space.md - 2,
-          gap: tight ? 5 : space.sm - 1,
-          opacity: pressed ? 0.93 : 1,
-        })}
-      >
-        <View style={{ flexDirection: 'row', alignItems: 'center', gap: space.sm + 2 }}>
-          <View style={{ width: 34, height: 34, alignItems: 'center', justifyContent: 'center' }}>
-            <Animated.View
-              pointerEvents="none"
-              style={[
-                {
-                  position: 'absolute',
-                  width: 34,
-                  height: 34,
-                  borderRadius: radius.pill,
-                  backgroundColor: '#FFFFFF',
-                },
-                ringStyle,
-              ]}
-            />
-            <View
-              style={{
-                width: 32,
-                height: 32,
-                borderRadius: radius.pill,
-                backgroundColor: 'rgba(255,255,255,0.25)',
-                borderWidth: 1.5,
-                borderColor: 'rgba(255,255,255,0.55)',
-                alignItems: 'center',
-                justifyContent: 'center',
-              }}
-            >
-              <Icon name="siren" size={17} color={c.onSiren} strokeWidth={1.9} />
-            </View>
+    <View style={{ width: box, height: box, alignItems: 'center', justifyContent: 'center' }}>
+      <Animated.View
+        pointerEvents="none"
+        style={[
+          {
+            position: 'absolute',
+            width: size,
+            height: size,
+            borderRadius: radius.pill,
+            backgroundColor: c.siren,
+          },
+          beacon,
+        ]}
+      />
+      <Animated.View style={pop}>
+        <Pressable
+          onPress={() => nav.navigate('Emergency')}
+          accessibilityRole="button"
+          accessibilityLabel={[t('emg.dial'), t('emg.titleShort'), sub].join('. ')}
+          style={({ pressed }) => ({
+            width: size,
+            height: size,
+            borderRadius: radius.pill,
+            backgroundColor: c.siren,
+            borderWidth: 4,
+            borderColor: '#FFFFFF',
+            overflow: 'hidden',
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: 2,
+            shadowColor: c.sirenDeep,
+            shadowOpacity: 0.45,
+            shadowRadius: 16,
+            shadowOffset: { width: 0, height: 8 },
+            elevation: 12,
+            opacity: pressed ? 0.92 : 1,
+          })}
+        >
+          {/*
+            Two marks, not one. This white one is clipped inside the red so
+            the button itself has some depth; the navy one on the paper
+            behind the dial carries the band around it. Both are faint enough
+            that the siren and the word EMERGENCY still read first.
+          */}
+          <View
+            pointerEvents="none"
+            style={{
+              position: 'absolute',
+              left: 0,
+              right: 0,
+              top: 0,
+              bottom: 0,
+              alignItems: 'center',
+              justifyContent: 'center',
+            }}
+          >
+            <LogoBlur size={Math.round(size * 1.12)} color="#FFFFFF" />
           </View>
 
-          <View style={{ flex: 1, minWidth: 0, gap: 3 }}>
-            <View
-              style={{
-                alignSelf: 'flex-start',
-                flexDirection: 'row',
-                alignItems: 'center',
-                gap: 5,
-                backgroundColor: '#FFFFFF',
-                borderRadius: radius.pill,
-                paddingLeft: 6,
-                paddingRight: 8,
-                paddingVertical: 2.5,
-              }}
-            >
-              <Animated.View
-                style={[{ width: 6, height: 6, borderRadius: 3, backgroundColor: c.siren }, dotStyle]}
-              />
-              <Text style={{ fontFamily: font.bold, fontSize: 8.5, letterSpacing: 0.9, color: c.sirenDeep }}>
-                {t('emg.alertLabel')}
-              </Text>
-            </View>
+          <Icon name="siren" size={mode === 'compact' ? 24 : 28} color={c.onSiren} strokeWidth={1.8} />
+          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
+            <Animated.View
+              style={[{ width: 5, height: 5, borderRadius: 3, backgroundColor: '#FFFFFF' }, blink]}
+            />
             <Text
               style={{
                 fontFamily: font.bold,
-                fontSize: tight ? 15 : 16.5,
-                lineHeight: tight ? 19 : 21,
-                letterSpacing: 0.3,
+                fontSize: mode === 'compact' ? 11 : 12,
+                letterSpacing: 0.6,
                 color: c.onSiren,
               }}
               numberOfLines={1}
             >
-              {title}
+              {t('emg.dial')}
             </Text>
           </View>
-        </View>
-
-        <Text
-          style={{ fontFamily: font.regular, fontSize: 11.5, lineHeight: 16, color: '#FFE0E3' }}
-          numberOfLines={2}
-        >
-          {body}
-        </Text>
-
-        <View style={{ flexDirection: 'row', justifyContent: 'flex-end' }}>
-          <View
-            style={{
-              backgroundColor: '#FFFFFF',
-              borderRadius: radius.md - 1,
-              paddingHorizontal: space.lg,
-              paddingVertical: tight ? space.sm : space.sm + 3,
-              flexDirection: 'row',
-              alignItems: 'center',
-              gap: 7,
-            }}
+          <Text
+            style={{ fontFamily: font.regular, fontSize: 8.5, lineHeight: 11, color: '#FFE0E3' }}
+            numberOfLines={1}
           >
-            <Text style={{ fontFamily: font.bold, fontSize: 13.5, color: c.siren }}>{cta}</Text>
-            <Icon name="arrowRight" size={14} color={c.siren} strokeWidth={2.2} />
-          </View>
-        </View>
-      </Pressable>
+            {sub}
+          </Text>
+        </Pressable>
+      </Animated.View>
+    </View>
+  );
+}
 
-      <View
-        style={{
-          backgroundColor: c.sirenDeep,
-          paddingHorizontal: space.md + 2,
-          paddingVertical: space.sm - 2,
-          flexDirection: 'row',
-          alignItems: 'center',
-          gap: 7,
-        }}
-      >
-        <Icon name="shieldCheck" size={12} color="#FFFFFF" />
-        <Text style={{ flex: 1, fontFamily: font.semibold, fontSize: 10, color: '#FFFFFF' }} numberOfLines={1}>
-          {t('common.otpNotice')}
-        </Text>
-      </View>
+/**
+ * Welded under the dial, because the moment someone reaches for it is the
+ * moment they are most likely to be talked into reading an OTP out loud
+ * (FR-CMP-04).
+ */
+function OtpNotice() {
+  const { c } = useTheme();
+  const { t } = useLang();
+  return (
+    <View
+      style={{
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 6,
+        backgroundColor: c.sirenBg,
+        borderRadius: radius.pill,
+        paddingHorizontal: space.md,
+        paddingVertical: 4,
+      }}
+    >
+      <Icon name="shieldCheck" size={11} color={c.sirenDeep} strokeWidth={1.9} />
+      <Text style={{ fontFamily: font.semibold, fontSize: 9.5, color: c.sirenDeep }} numberOfLines={1}>
+        {t('common.otpNotice')}
+      </Text>
     </View>
   );
 }
@@ -567,6 +641,7 @@ function Tile({
   icon,
   title,
   desc,
+  descTint,
   tint,
   bg,
   mode,
@@ -575,6 +650,7 @@ function Tile({
   icon: IconName;
   title: string;
   desc: string;
+  descTint?: string;
   tint: string;
   bg: string;
   mode: Mode;
@@ -593,34 +669,34 @@ function Tile({
         backgroundColor: bg,
         borderRadius: radius.lg - 1,
         paddingHorizontal: space.md - 1,
-        paddingVertical: tight ? 7 : 9,
-        gap: tight ? 4 : 6,
+        paddingVertical: tight ? 6 : 7,
+        gap: tight ? 3 : 5,
         opacity: pressed ? 0.8 : 1,
       })}
     >
       <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
         <View
           style={{
-            width: tight ? 27 : 32,
-            height: tight ? 27 : 32,
+            width: tight ? 25 : 29,
+            height: tight ? 25 : 29,
             borderRadius: radius.pill,
             backgroundColor: tint,
             alignItems: 'center',
             justifyContent: 'center',
           }}
         >
-          <Icon name={icon} size={tight ? 15 : 17} color="#FFFFFF" strokeWidth={1.8} />
+          <Icon name={icon} size={tight ? 14 : 16} color="#FFFFFF" strokeWidth={1.8} />
         </View>
         <Icon name="arrowRight" size={14} color={tint} strokeWidth={2} />
       </View>
       <View>
         <Text
-          style={{ fontFamily: font.bold, fontSize: tight ? 12 : 13, lineHeight: tight ? 15 : 16, color: c.ink }}
+          style={{ fontFamily: font.bold, fontSize: tight ? 11.5 : 12.5, lineHeight: tight ? 14 : 15, color: c.ink }}
           numberOfLines={1}
         >
           {title}
         </Text>
-        <Text style={{ fontFamily: font.regular, fontSize: 10, lineHeight: 13, color: c.ink2 }} numberOfLines={1}>
+        <Text style={{ fontFamily: font.regular, fontSize: 9.5, lineHeight: 12, color: descTint ?? c.ink2 }} numberOfLines={1}>
           {desc}
         </Text>
       </View>
@@ -727,255 +803,318 @@ function ActiveCaseCard({ mode }: { mode: Mode }) {
   );
 }
 
+// ── upcoming ──────────────────────────────────────────────────────────
 
-// ── legal protection ──────────────────────────────────────────────────
-
-type Health = 'ok' | 'warn' | 'bad';
+const CATEGORY_ICON: Record<string, IconName> = {
+  identity: 'user',
+  property: 'doc',
+  financial: 'bank',
+  insurance: 'cover',
+  family: 'users',
+  vehicle: 'car',
+  contracts: 'letter',
+  business: 'globe',
+};
 
 /**
- * A standing status line for the four things the app is quietly watching.
- *
- * Every value is read off real state — how many documents are in the vault,
- * when the next insurance and vehicle papers run out, how many consultations
- * are left. The tick only stays green while that is genuinely true; a date
- * inside two weeks turns amber and a lapsed one turns red, so the row is a
- * status report rather than four reassuring ticks.
+ * Every document in the vault that runs out inside the next three months,
+ * soonest first. This is the only place on the screen that is ordered by time
+ * rather than by importance, which is the point: a renewal date does not care
+ * how important the paper is.
  */
-function LegalProtection({ mode }: { mode: Mode }) {
+function UpcomingSection({ mode }: { mode: Mode }) {
   const { c } = useTheme();
   const { t, lang } = useLang();
   const nav = useNavigation<Nav>();
-  const { docs, consultsLeft, plan } = useApp();
-  const { value: wave, running } = useWave();
+  const { docs } = useApp();
   const tight = mode === 'compact';
 
-  /** Soonest-expiring document in a category, if there is one. */
-  const soonest = (category: string) =>
-    docs
-      .filter((d) => d.category === category && d.expiryDate)
-      .sort((a, b) => daysUntil(a.expiryDate!) - daysUntil(b.expiryDate!))[0];
-
-  const dateLine = (doc?: { expiryDate?: string }): { value: string; health: Health } => {
-    if (!doc?.expiryDate) return { value: t('prot.notAdded'), health: 'warn' };
-    const days = daysUntil(doc.expiryDate);
-    if (days < 0) return { value: t('prot.expired'), health: 'bad' };
-    return {
-      value: lang === 'hi' ? `${days} दिन में` : `In ${days} days`,
-      health: days <= 15 ? 'warn' : 'ok',
-    };
-  };
-
-  const insurance = dateLine(soonest('insurance'));
-  const vehicle = dateLine(soonest('vehicle'));
-
-  const items: { label: string; value: string; health: Health }[] = [
-    {
-      label: t('prot.documents'),
-      value: `${docs.length} ${t('prot.files')}`,
-      health: docs.length > 0 ? 'ok' : 'warn',
-    },
-    { label: t('prot.insurance'), value: insurance.value, health: insurance.health },
-    { label: t('prot.vehicle'), value: vehicle.value, health: vehicle.health },
-    {
-      label: t('prot.consultation'),
-      value: plan === 'FREE' ? t('prot.none') : `${consultsLeft} ${t('prot.left')}`,
-      health: plan === 'FREE' || consultsLeft === 0 ? 'warn' : 'ok',
-    },
-  ];
-
-  const badge = tight ? 18 : 20;
+  const soon = docs
+    .filter((d) => d.expiryDate && daysUntil(d.expiryDate) <= 90)
+    .sort((a, b) => daysUntil(a.expiryDate!) - daysUntil(b.expiryDate!))
+    .slice(0, 3);
 
   return (
+    <View style={{ gap: tight ? 6 : space.sm }}>
+      <SectionRow title={t('home.upcoming')} action={t('common.viewAll')} onAction={() => nav.navigate('Vault')} />
+      <View
+        style={{
+          backgroundColor: c.card,
+          borderWidth: 1,
+          borderColor: c.line,
+          borderRadius: radius.lg,
+          paddingHorizontal: space.md,
+        }}
+      >
+        {soon.length === 0 ? (
+          <Text
+            style={{
+              fontFamily: font.regular,
+              fontSize: 11.5,
+              lineHeight: 15,
+              color: c.ink3,
+              paddingVertical: space.md,
+            }}
+          >
+            {t('up.none')}
+          </Text>
+        ) : (
+          soon.map((doc, i) => {
+            const days = daysUntil(doc.expiryDate!);
+            const late = days < 0;
+            const tint = late ? c.siren : days <= 30 ? c.brass : c.ink2;
+            const chipBg = late ? c.sirenBg : days <= 30 ? c.brassBg : c.card2;
+            const chip = late
+              ? t('up.expired')
+              : `${days} ${days === 1 ? t('up.dayLeft') : t('up.daysLeft')}`;
+            return (
+              <Pressable
+                key={doc.id}
+                onPress={() => nav.navigate('Document', { id: doc.id })}
+                accessibilityRole="button"
+                accessibilityLabel={`${lang === 'hi' ? doc.title.hi : doc.title.en}. ${chip}`}
+                style={({ pressed }) => ({
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                  gap: space.sm + 2,
+                  paddingVertical: tight ? 8 : 10,
+                  borderTopWidth: i === 0 ? 0 : 1,
+                  borderTopColor: c.line2,
+                  opacity: pressed ? 0.75 : 1,
+                })}
+              >
+                <View
+                  style={{
+                    width: tight ? 28 : 31,
+                    height: tight ? 28 : 31,
+                    borderRadius: radius.sm + 2,
+                    backgroundColor: chipBg,
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                  }}
+                >
+                  <Icon
+                    name={CATEGORY_ICON[doc.category] ?? 'doc'}
+                    size={tight ? 15 : 16}
+                    color={tint}
+                    strokeWidth={1.7}
+                  />
+                </View>
+                <Text
+                  style={{
+                    flex: 1,
+                    minWidth: 0,
+                    fontFamily: font.semibold,
+                    fontSize: tight ? 12 : 12.5,
+                    lineHeight: 16,
+                    color: c.ink,
+                  }}
+                  numberOfLines={1}
+                >
+                  {lang === 'hi' ? doc.title.hi : doc.title.en}
+                </Text>
+                <View
+                  style={{
+                    backgroundColor: chipBg,
+                    borderRadius: radius.pill,
+                    paddingHorizontal: space.sm + 1,
+                    paddingVertical: 3,
+                  }}
+                >
+                  <Text style={{ fontFamily: font.semibold, fontSize: 9.5, color: tint }} numberOfLines={1}>
+                    {chip}
+                  </Text>
+                </View>
+                <Icon name="chevronRight" size={13} color={c.ink3} />
+              </Pressable>
+            );
+          })
+        )}
+      </View>
+    </View>
+  );
+}
+
+// ── digilocker ────────────────────────────────────────────────────────
+
+/**
+ * DigiLocker import. NOT in Product Scope v1 — it needs a change request
+ * before it is built for real, so this is wired to the vault rather than
+ * pretending to hold a government session it does not have.
+ */
+function DigiLockerCard() {
+  const { c } = useTheme();
+  const { t } = useLang();
+  const nav = useNavigation<Nav>();
+  return (
     <Pressable
-      onPress={() => nav.navigate('Services')}
+      onPress={() => nav.navigate('Vault')}
       accessibilityRole="button"
+      accessibilityLabel={`${t('dl.title')}. ${t('dl.sub')}`}
       style={({ pressed }) => ({
-        backgroundColor: c.card,
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: space.md - 1,
+        backgroundColor: c.accentBg,
         borderWidth: 1,
         borderColor: c.line,
         borderRadius: radius.lg,
         paddingHorizontal: space.md,
-        paddingVertical: tight ? 6 : 7,
-        gap: tight ? 6 : 7,
-        opacity: pressed ? 0.92 : 1,
+        paddingVertical: space.md - 2,
+        opacity: pressed ? 0.9 : 1,
       })}
     >
-      <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
-        <Icon name="shieldCheck" size={13} color={c.accent} strokeWidth={1.8} />
-        <Text
-          style={{ flex: 1, fontFamily: font.bold, fontSize: 12.5, lineHeight: tight ? 14 : 15, color: c.ink }}
-          numberOfLines={1}
-        >
-          {t('home.protection')}
-        </Text>
-        {!tight && (
-          <Text style={{ fontFamily: font.medium, fontSize: 10, color: c.ink3 }} numberOfLines={1}>
-            {t('home.protectionSub')}
-          </Text>
-        )}
-        <Icon name="chevronRight" size={13} color={c.ink3} />
+      <View
+        style={{
+          width: 34,
+          height: 34,
+          borderRadius: radius.sm + 2,
+          backgroundColor: c.card,
+          alignItems: 'center',
+          justifyContent: 'center',
+        }}
+      >
+        <Icon name="folder" size={18} color={c.accent} strokeWidth={1.7} />
       </View>
-
-      <View style={{ flexDirection: 'row', gap: space.xs }}>
-        {items.map((item, i) => {
-          const tint = item.health === 'bad' ? c.siren : item.health === 'warn' ? c.brass : c.accent;
-          return (
-            <View key={item.label} style={{ flex: 1, minWidth: 0, alignItems: 'center', gap: 2 }}>
-              <ProtBadge
-                driver={wave}
-                running={running}
-                index={i}
-                size={badge}
-                tint={tint}
-                icon={item.health === 'ok' ? 'check' : item.health === 'warn' ? 'clock' : 'alert'}
-                urgent={item.health !== 'ok'}
-              />
-              <Text
-                style={{ fontFamily: font.semibold, fontSize: 9.5, lineHeight: tight ? 11 : 12, color: c.ink }}
-                numberOfLines={1}
-              >
-                {item.label}
-              </Text>
-              <Text
-                style={{ fontFamily: font.regular, fontSize: 8.5, lineHeight: tight ? 10 : 11, color: tint }}
-                numberOfLines={1}
-              >
-                {item.value}
-              </Text>
-            </View>
-          );
-        })}
+      <View style={{ flex: 1, minWidth: 0, gap: 1 }}>
+        <Text style={{ fontFamily: font.bold, fontSize: 13, lineHeight: 17, color: c.ink }} numberOfLines={1}>
+          {t('dl.title')}
+        </Text>
+        <Text style={{ fontFamily: font.regular, fontSize: 10.5, lineHeight: 14, color: c.ink2 }} numberOfLines={2}>
+          {t('dl.sub')}
+        </Text>
+      </View>
+      <View
+        style={{
+          flexDirection: 'row',
+          alignItems: 'center',
+          gap: 5,
+          backgroundColor: c.accent,
+          borderRadius: radius.md - 2,
+          paddingHorizontal: space.md,
+          paddingVertical: 8,
+        }}
+      >
+        <Text style={{ fontFamily: font.bold, fontSize: 12, color: '#FFFFFF' }}>{t('dl.cta')}</Text>
+        <Icon name="arrowRight" size={12} color="#FFFFFF" strokeWidth={2.2} />
       </View>
     </Pressable>
   );
 }
 
+// ── the two closing offers ────────────────────────────────────────────
+
 /**
- * One linear driver for the whole row: each badge reads its own slice of it, so
- * the four symbols fire in sequence off a single animation rather than four
- * competing ones. Stopped outright when the OS asks for reduced motion.
+ * Both of these end at the advocate, and deliberately so: drafting a will or
+ * a legal notice is advocate work, and the compliance rules are explicit that
+ * the assistant gives information rather than advice (FR-AIA-02/03). Document
+ * drafting itself is not in Scope v1 either, so this is an entry point to a
+ * consultation, not a drafting engine.
  */
-function useWave() {
-  const value = useRef(new Animated.Value(0)).current;
-  const [allowed, setAllowed] = useState(true);
+function PromoCards({ mode }: { mode: Mode }) {
+  const { c } = useTheme();
+  const { t } = useLang();
+  const nav = useNavigation<Nav>();
+  const tight = mode === 'compact';
 
-  useEffect(() => {
-    let alive = true;
-    AccessibilityInfo.isReduceMotionEnabled().then((reduce) => {
-      if (alive) setAllowed(!reduce);
-    });
-    const sub = AccessibilityInfo.addEventListener('reduceMotionChanged', (reduce) => setAllowed(!reduce));
-    return () => {
-      alive = false;
-      sub.remove();
-    };
-  }, []);
-
-  useEffect(() => {
-    if (!allowed) {
-      value.setValue(0);
-      return;
-    }
-    value.setValue(0);
-    const loop = Animated.loop(
-      Animated.timing(value, {
-        toValue: 1,
-        duration: CYCLE,
-        easing: Easing.linear,
-        // There is no native animated module on web; asking for it there only
-        // logs a warning and falls back to the JS driver anyway.
-        useNativeDriver: Platform.OS !== 'web',
-      }),
-    );
-    loop.start();
-    return () => loop.stop();
-  }, [allowed, value]);
-
-  return { value, running: allowed };
-}
-
-/** One full pass of the wave, in milliseconds. */
-const CYCLE = 2600;
-/** How far apart the four badges fire, as a fraction of the cycle. */
-const POP_STEP = 0.1;
-/**
- * The halo is capped at 1.45× — a ~4.5px ring on a 20px badge, which stays
- * inside the 7px gap above it and the label's own leading below. The blink
- * does the work of being noticed; it costs no pixels at all, so nothing on
- * this row ever reaches into its neighbour.
- */
-const RING_MAX = 1.45;
-
-function ProtBadge(props: {
-  driver: Animated.Value;
-  running: boolean;
-  index: number;
-  size: number;
-  tint: string;
-  icon: IconName;
-  urgent: boolean;
-}) {
-  const { driver, running, index, size, tint, icon, urgent } = props;
-
-  /**
-   * Each badge blinks twice — off hard, back, off softer, back — and swells as
-   * it goes. One blink alone reads as a rendering glitch; two read as a signal.
-   * The amber and red badges blink deeper and swell further than the blue ones,
-   * so the row can be understood without being read.
-   */
-  const s = 0.02 + index * POP_STEP;
-  const frames = [0, s, s + 0.04, s + 0.09, s + 0.13, s + 0.17, 1];
-  const scale = driver.interpolate({
-    inputRange: frames,
-    outputRange: [1, 1, urgent ? 1.34 : 1.24, 1, urgent ? 1.18 : 1.12, 1, 1],
-  });
-  const opacity = driver.interpolate({
-    inputRange: frames,
-    outputRange: [1, 1, urgent ? 0.12 : 0.22, 1, urgent ? 0.3 : 0.42, 1, 1],
-  });
-  const ringOpacity = driver.interpolate({
-    inputRange: [0, s, s + 0.005, s + 0.09, 1],
-    outputRange: [0, 0, 0.5, 0, 0],
-  });
-  const ringScale = driver.interpolate({
-    inputRange: [0, s, s + 0.09, 1],
-    outputRange: [1, 1, RING_MAX, RING_MAX],
-  });
-
-  const glyph = (
-    <View
-      style={{
-        width: size,
-        height: size,
-        borderRadius: radius.pill,
-        backgroundColor: tint,
-        alignItems: 'center',
-        justifyContent: 'center',
-      }}
-    >
-      <Icon name={icon} size={size - 8} color="#FFFFFF" strokeWidth={2.3} />
-    </View>
-  );
-
-  if (!running) return glyph;
+  const card = {
+    flex: 1,
+    minWidth: 0,
+    borderRadius: radius.lg,
+    paddingHorizontal: space.md,
+    paddingVertical: tight ? space.md - 2 : space.md,
+    gap: tight ? 6 : space.sm,
+  } as const;
 
   return (
-    <View style={{ width: size, height: size }}>
-      <Animated.View
-        pointerEvents="none"
-        style={{
-          position: 'absolute',
-          left: 0,
-          top: 0,
-          width: size,
-          height: size,
-          borderRadius: radius.pill,
-          backgroundColor: tint,
-          opacity: ringOpacity,
-          transform: [{ scale: ringScale }],
-        }}
-      />
-      <Animated.View style={{ opacity, transform: [{ scale }] }}>{glyph}</Animated.View>
+    <View style={{ flexDirection: 'row', gap: space.sm }}>
+      <Pressable
+        onPress={() => nav.navigate('Consult')}
+        accessibilityRole="button"
+        accessibilityLabel={`${t('promo.draft.title')} ${t('promo.draft.sub')} ${t('promo.draft.cta')}`}
+        style={({ pressed }) => ({ ...card, backgroundColor: c.forest, opacity: pressed ? 0.92 : 1 })}
+      >
+        <View
+          style={{
+            width: 30,
+            height: 30,
+            borderRadius: radius.sm,
+            backgroundColor: 'rgba(255,255,255,0.16)',
+            alignItems: 'center',
+            justifyContent: 'center',
+          }}
+        >
+          <Icon name="letter" size={16} color={c.onForest} strokeWidth={1.7} />
+        </View>
+        <View style={{ gap: 2 }}>
+          <Text
+            style={{ fontFamily: font.bold, fontSize: tight ? 12.5 : 13.5, lineHeight: 17, color: c.onForest }}
+          >
+            {t('promo.draft.title')}
+          </Text>
+          <Text style={{ fontFamily: font.regular, fontSize: 10, lineHeight: 13.5, color: c.onForestDim }}>
+            {t('promo.draft.sub')}
+          </Text>
+        </View>
+        <View
+          style={{
+            alignSelf: 'flex-start',
+            flexDirection: 'row',
+            alignItems: 'center',
+            gap: 5,
+            backgroundColor: c.onForest,
+            borderRadius: radius.pill,
+            paddingHorizontal: space.md - 1,
+            paddingVertical: 6,
+          }}
+        >
+          <Text style={{ fontFamily: font.bold, fontSize: 11, color: c.forest }}>{t('promo.draft.cta')}</Text>
+          <Icon name="arrowRight" size={11} color={c.forest} strokeWidth={2.2} />
+        </View>
+      </Pressable>
+
+      <Pressable
+        onPress={() => nav.navigate('Consult')}
+        accessibilityRole="button"
+        accessibilityLabel={`${t('promo.advice.title')} ${t('promo.advice.sub')} ${t('promo.advice.cta')}`}
+        style={({ pressed }) => ({ ...card, backgroundColor: c.brassBg, opacity: pressed ? 0.92 : 1 })}
+      >
+        <View
+          style={{
+            width: 30,
+            height: 30,
+            borderRadius: radius.sm,
+            backgroundColor: c.card,
+            alignItems: 'center',
+            justifyContent: 'center',
+          }}
+        >
+          <Icon name="scales" size={16} color={c.brass} strokeWidth={1.7} />
+        </View>
+        <View style={{ gap: 2 }}>
+          <Text style={{ fontFamily: font.bold, fontSize: tight ? 12.5 : 13.5, lineHeight: 17, color: c.ink }}>
+            {t('promo.advice.title')}
+          </Text>
+          <Text style={{ fontFamily: font.regular, fontSize: 10, lineHeight: 13.5, color: c.ink2 }}>
+            {t('promo.advice.sub')}
+          </Text>
+        </View>
+        <View
+          style={{
+            alignSelf: 'flex-start',
+            flexDirection: 'row',
+            alignItems: 'center',
+            gap: 5,
+            backgroundColor: c.brass,
+            borderRadius: radius.pill,
+            paddingHorizontal: space.md - 1,
+            paddingVertical: 6,
+          }}
+        >
+          <Text style={{ fontFamily: font.bold, fontSize: 11, color: '#FFFFFF' }}>{t('promo.advice.cta')}</Text>
+          <Icon name="arrowRight" size={11} color="#FFFFFF" strokeWidth={2.2} />
+        </View>
+      </Pressable>
     </View>
   );
 }

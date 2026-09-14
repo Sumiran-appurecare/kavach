@@ -13,7 +13,7 @@ import {
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Icon, IconName } from '../components/Icon';
 import { Logo, LogoBlur } from '../components/Logo';
-import { ThemedStatusBar } from '../components/ui';
+import { ThemedStatusBar, useCountdown } from '../components/ui';
 import { daysUntil, USER } from '../data/mock';
 import { rupees, useLang } from '../i18n/LanguageProvider';
 import { StringKey } from '../i18n/strings';
@@ -143,44 +143,7 @@ export function HomeScreen() {
         }}
         showsVerticalScrollIndicator={false}
       >
-        {/*
-          The mark lies on the paper behind the dial — big, navy and soft —
-          so the band around the button is brand rather than blank. The dial
-          paints over the middle of it, which leaves a halo of shield showing
-          around the red. It is absolutely positioned, so it can wash the
-          background without ever pushing a single pixel of layout.
-        */}
-        <View
-          style={{
-            alignItems: 'center',
-            justifyContent: 'center',
-            gap: mode === 'compact' ? 5 : 6,
-          }}
-        >
-          <View
-            pointerEvents="none"
-            style={{
-              position: 'absolute',
-              left: 0,
-              right: 0,
-              top: 0,
-              bottom: 0,
-              alignItems: 'center',
-              justifyContent: 'center',
-            }}
-          >
-            <LogoBlur
-              size={mode === 'compact' ? 186 : 216}
-              color={c.forest}
-              layers={6}
-              spread={0.05}
-              step={0.035}
-            />
-          </View>
-
-          <EmergencyDial mode={mode} />
-          <OtpNotice />
-        </View>
+        <EmergencyRow mode={mode} />
 
         {fraudCase ? (
           <View style={{ gap: mode === 'compact' ? 6 : space.sm }}>
@@ -197,7 +160,7 @@ export function HomeScreen() {
           />
           <View style={{ flexDirection: 'row', gap: space.sm }}>
             <Tile
-              icon="shieldCheck"
+              icon="scan"
               tint={c.leaf}
               bg={c.leafBg}
               title={t('f.scam')}
@@ -497,7 +460,7 @@ function EmergencyDial({ mode }: { mode: Mode }) {
   const { fraudCase } = useApp();
   const { value, running } = usePulse();
 
-  const size = mode === 'compact' ? 100 : 116;
+  const size = mode === 'compact' ? 118 : 134;
 
   const beacon = {
     opacity: value.interpolate({ inputRange: [0, 1], outputRange: [0.45, 0] }),
@@ -1115,6 +1078,183 @@ function PromoCards({ mode }: { mode: Mode }) {
           <Icon name="arrowRight" size={11} color="#FFFFFF" strokeWidth={2.2} />
         </View>
       </Pressable>
+    </View>
+  );
+}
+
+// ── the two actions either side of the dial ───────────────────────────
+
+/** A date the countdown will always read as expired, for the no-case state. */
+const NO_WINDOW = new Date(0).toISOString();
+
+/**
+ * The dial answers "I do not know what to do". These two answer "I know
+ * exactly what to do" — and they are the two reports that actually decide
+ * whether the money comes back: the bank, and 1930 (FR-EMG-01/04/05). Until
+ * now both were three taps away.
+ *
+ * They are deliberately not filled red. The dial has to stay the only
+ * saturated red on the screen, because that is what makes it findable when
+ * someone is panicking; these sit in the pale tint of the same family so they
+ * read as part of the emergency path without competing with it.
+ */
+function EmergencyFlank({
+  icon,
+  title,
+  sub,
+  subTint,
+  onPress,
+  mode,
+}: {
+  icon: IconName;
+  title: string;
+  sub: string;
+  subTint?: string;
+  onPress: () => void;
+  mode: Mode;
+}) {
+  const { c } = useTheme();
+  const tight = mode === 'compact';
+  return (
+    <Pressable
+      onPress={onPress}
+      accessibilityRole="button"
+      accessibilityLabel={`${title}. ${sub}`}
+      style={({ pressed }) => ({
+        flex: 1,
+        minWidth: 0,
+        alignItems: 'center',
+        gap: tight ? 3 : 4,
+        backgroundColor: c.peach,
+        borderWidth: 1,
+        borderColor: c.sirenLine,
+        borderRadius: radius.lg,
+        paddingHorizontal: 4,
+        paddingVertical: tight ? 8 : 10,
+        opacity: pressed ? 0.8 : 1,
+      })}
+    >
+      <Icon name={icon} size={tight ? 16 : 17} color={c.sirenDeep} strokeWidth={1.8} />
+      <Text
+        style={{
+          fontFamily: font.bold,
+          fontSize: tight ? 10 : 10.5,
+          lineHeight: tight ? 12.5 : 13,
+          color: c.sirenDeep,
+          textAlign: 'center',
+        }}
+        numberOfLines={2}
+      >
+        {title}
+      </Text>
+      <Text
+        style={{
+          fontFamily: font.regular,
+          fontSize: 8,
+          lineHeight: 10.5,
+          color: subTint ?? c.ink2,
+          textAlign: 'center',
+        }}
+        numberOfLines={2}
+      >
+        {sub}
+      </Text>
+    </Pressable>
+  );
+}
+
+/**
+ * The whole emergency row: 1930 on the left, the dial in the middle, the bank
+ * on the right, with the mark washed across the paper behind all three.
+ *
+ * The dial keeps its own reserved square, so the beacon ring expands inside
+ * that square and never reaches either button.
+ */
+function EmergencyRow({ mode }: { mode: Mode }) {
+  const { c } = useTheme();
+  const { t } = useLang();
+  const nav = useNavigation<Nav>();
+  const { fraudCase } = useApp();
+  const left = useCountdown(fraudCase?.windowExpiresAt ?? NO_WINDOW);
+
+  const bankDone = Boolean(fraudCase?.bankReportedAt);
+  const windowSub = left.expired
+    ? t('emg.flank.windowGone')
+    : left.d > 0
+      ? `${left.d}d ${left.h}h ${t('emg.flank.left')}`
+      : `${left.h}h ${left.m}m ${t('emg.flank.left')}`;
+
+  const tight = mode === 'compact';
+
+  return (
+    <View
+      style={{
+        backgroundColor: c.cardWarm,
+        borderWidth: 1,
+        borderColor: c.line,
+        borderRadius: radius.xl,
+        overflow: 'hidden',
+        paddingHorizontal: 10,
+        paddingVertical: tight ? 10 : 12,
+        alignItems: 'center',
+        justifyContent: 'center',
+        gap: tight ? 7 : 8,
+      }}
+    >
+      {/*
+        The mark is bigger than the card on purpose. The card clips it, so it
+        bleeds off every edge the way a watermark on letterhead does, and the
+        outline flanks let it read straight through them. overflow hidden is
+        what keeps it inside the rounded corners.
+      */}
+      <View
+        pointerEvents="none"
+        style={{
+          position: 'absolute',
+          left: 0,
+          right: 0,
+          top: 0,
+          bottom: 0,
+          alignItems: 'center',
+          justifyContent: 'center',
+        }}
+      >
+        <LogoBlur
+          size={tight ? 300 : 340}
+          color={c.forest}
+          layers={6}
+          spread={0.05}
+          step={0.035}
+        />
+      </View>
+
+      <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+        <EmergencyFlank
+          icon="phone"
+          title={t('emg.flank.1930')}
+          sub={fraudCase ? windowSub : t('emg.flank.1930sub')}
+          subTint={fraudCase ? c.sirenDeep : undefined}
+          onPress={() => nav.navigate('Emergency')}
+          mode={mode}
+        />
+        <EmergencyDial mode={mode} />
+        <EmergencyFlank
+          icon="bank"
+          title={t('emg.flank.bank')}
+          sub={
+            !fraudCase
+              ? t('emg.flank.bankSub')
+              : bankDone
+                ? t('emg.flank.bankDone')
+                : t('emg.flank.bankPending')
+          }
+          subTint={fraudCase && !bankDone ? c.sirenDeep : fraudCase ? c.leaf : undefined}
+          onPress={() => nav.navigate(fraudCase ? 'FraudCase' : 'Emergency')}
+          mode={mode}
+        />
+      </View>
+
+      <OtpNotice />
     </View>
   );
 }

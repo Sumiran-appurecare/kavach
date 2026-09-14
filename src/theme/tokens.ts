@@ -20,6 +20,7 @@ export type Palette = {
   paper: string;
   card: string;
   card2: string;
+  cardWarm: string;
 
   /** Header gradient, dark → darker, plus the ink used on top of it. */
   forest: string;
@@ -44,6 +45,8 @@ export type Palette = {
   accentBg: string;
 
   siren: string;
+  sirenLine: string;
+  peach: string;
   sirenDeep: string;
   onSiren: string;
   sirenBg: string;
@@ -78,6 +81,7 @@ export const light: Palette = {
   paper: '#F1F6FA',
   card: '#FFFFFF',
   card2: '#F6F9FC',
+  cardWarm: '#FBF8F4',
 
   forest: '#16325C',
   forest2: '#1F4478',
@@ -99,6 +103,8 @@ export const light: Palette = {
   accentBg: '#E6F0FC',
 
   siren: '#E23744',
+  sirenLine: '#F4C7CC',
+  peach: 'rgba(255, 231, 214, 0.85)',
   sirenDeep: '#C61F2C',
   onSiren: '#FFFFFF',
   sirenBg: '#FDECEE',
@@ -131,6 +137,7 @@ export const dark: Palette = {
   paper: '#060D18',
   card: '#0E1B2D',
   card2: '#132338',
+  cardWarm: '#141F2E',
 
   forest: '#122A4C',
   forest2: '#1B3B66',
@@ -152,6 +159,8 @@ export const dark: Palette = {
   accentBg: '#15294A',
 
   siren: '#F04C5A',
+  sirenLine: '#5C2730',
+  peach: 'rgba(122, 66, 42, 0.38)',
   sirenDeep: '#C61F2C',
   onSiren: '#FFFFFF',
   sirenBg: '#301621',

@@ -113,9 +113,13 @@ const P: Record<string, Stroke[]> = {
   ],
   arrowRight: [{ d: 'M4 10h11M10.5 5.5 15 10l-4.5 4.5' }],
   /** Scan frame: four corner brackets and a sweep line. */
+  /** The scanner viewfinder: four brackets and the line sweeping across. */
   scan: [
-    { d: 'M3.4 6.6V4.4h2.2M16.6 6.6V4.4h-2.2M3.4 13.4v2.2h2.2M16.6 13.4v2.2h-2.2' },
-    { d: 'M3.4 10h13.2' },
+    { d: 'M3.2 7.4V5.2a2 2 0 0 1 2-2h2.2' },
+    { d: 'M12.6 3.2h2.2a2 2 0 0 1 2 2v2.2' },
+    { d: 'M16.8 12.6v2.2a2 2 0 0 1-2 2h-2.2' },
+    { d: 'M7.4 16.8H5.2a2 2 0 0 1-2-2v-2.2' },
+    { d: 'M3.8 10h12.4' },
   ],
   /** Beacon: the rotating-light siren, for the emergency alert. */
   siren: [

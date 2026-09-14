@@ -5,7 +5,7 @@
       "x": 0,
       "y": 0,
       "w": 390,
-      "h": 1238,
+      "h": 1209,
       "title": "Home — case open (scrolls)"
     },
     {
@@ -13,7 +13,7 @@
       "x": 520,
       "y": 0,
       "w": 390,
-      "h": 1156,
+      "h": 1140,
       "title": "Home — quiet day (scrolls)"
     }
   ],
@@ -23,7 +23,7 @@
       "x": -350,
       "y": 0,
       "w": 300,
-      "text": "IT SCROLLS NOW\n\nThese frames are the whole page, not one viewport. On a phone you see the header, the dial and the first services; everything below arrives on a swipe. The tab bar sits outside the scroll, so it never moves.\n\nTHE DIAL, AT THE TOP\n\nIt is the first thing on the page, so it is the first thing a thumb finds, and the logo is blurred into the red behind it — a real gaussian blur, not a dimmed copy, because a logo at low opacity keeps its hard edges and reads as a second weaker logo rather than as depth.\n\nThree things move on one 1.5s beat: the dial pops, a beacon swells out from behind it, the dot beside EMERGENCY blinks. The beacon is capped at 1.19x inside a fixed square, so it never touches a tile. All of it stops under reduced motion (NFR-18).\n\nONE THING TO DECIDE: because the page scrolls, the dial can scroll out of sight. For the one button someone reaches for in a panic that is worth fixing — a small red pill that sticks to the bottom once the dial leaves the screen. Say the word and I will add it."
+      "text": "THE EMERGENCY ROW\n\nThe gutters either side of the dial were 121px of blank paper each. They now hold the two reports that actually decide whether the money comes back: the bank, and 1930 (FR-EMG-01/04/05). Until now both were three taps away.\n\nThe dial still answers \"I do not know what to do\" and has grown to 150px, because a button reached for in a panic should be hittable without aiming. The two beside it answer \"I know exactly what to do\".\n\nNeither flank is filled red. The dial has to stay the only saturated red on the screen — that is what makes it findable in a panic — so these sit in the pale tint of the same family: part of the emergency path, not competing with it.\n\nBoth flanks report real state. On the left board a case is open, so the left button counts down the five-day window and the right one says the bank has already been told; on the quiet day they carry their plain descriptions instead.\n\nThe dial keeps its own 179px reserved square, so the beacon expands inside that square and never reaches either button.\n\nThe mark is washed across the paper behind all three, and a second, whiter one is clipped inside the red."
     },
     {
       "id": "note-fit",

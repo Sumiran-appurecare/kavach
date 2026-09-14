@@ -154,7 +154,7 @@ export function ShieldScreen() {
             ) : (
               <PrimaryButton
                 label={busy ? t('scm.checking') : t('scm.check')}
-                icon="shieldCheck"
+                icon="scan"
                 busy={busy}
                 disabled={!value.trim()}
                 onPress={check}

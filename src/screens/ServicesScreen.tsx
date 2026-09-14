@@ -36,7 +36,7 @@ export function ServicesScreen() {
           }}
         >
           <ListRow
-            icon="shieldCheck"
+            icon="scan"
             iconTone="leaf"
             title={t('f.scam')}
             sub={scamChecksLeft === 'unlimited' ? t('scm.unlimited') : `${scamChecksLeft} ${t('scm.left')}`}

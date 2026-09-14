@@ -40,3 +40,6 @@ yarn-error.*
 /ios
 /android
 web-build/
+
+# generated export wrappers — the PNG/PDF beside them are the deliverable
+design/export/*.html

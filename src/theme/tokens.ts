@@ -232,7 +232,7 @@ export const radius = {
  * `lineHeight * lines`. Every Text uses Hind for both scripts (see `font`
  * above), so this floor applies everywhere, not just Hindi-only surfaces.
  */
-export function leading(size: number, ratio = 1.42): number {
+export function leading(size: number, ratio = 1.6): number {
   return Math.round(size * ratio * 2) / 2;
 }
 

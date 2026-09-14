@@ -7,7 +7,7 @@ import { useLang } from '../i18n/LanguageProvider';
 import { Nav } from '../navigation/types';
 import { useApp } from '../state/AppState';
 import { useTheme } from '../theme/ThemeProvider';
-import { font, radius, space } from '../theme/tokens';
+import { font, leading, radius, space } from '../theme/tokens';
 
 /**
  * The one-tap path (FR-EMG-01/02/03).
@@ -64,7 +64,7 @@ export function EmergencyScreen() {
             }}
           >
             <View>
-              <Text style={{ fontFamily: font.display, fontSize: 20, lineHeight: 25, color: c.onSiren }}>
+              <Text style={{ fontFamily: font.display, fontSize: 20, lineHeight: leading(20), color: c.onSiren }}>
                 {t('emg.connect.title')}
               </Text>
               <Text
@@ -222,7 +222,7 @@ function CallRow({
       </View>
       <View style={{ flex: 1, minWidth: 0 }}>
         <Text style={{ fontFamily: font.semibold, fontSize: 14, color: c.ink }}>{title}</Text>
-        <Text style={{ fontFamily: font.regular, fontSize: 11.5, lineHeight: 16, color: c.ink3, marginTop: 1 }}>
+        <Text style={{ fontFamily: font.regular, fontSize: 11.5, lineHeight: leading(11.5), color: c.ink3, marginTop: 1 }}>
           {sub}
         </Text>
       </View>
@@ -278,7 +278,7 @@ function BankRow() {
         }}
       >
         <Icon name="alert" size={14} color={c.brass} />
-        <Text style={{ flex: 1, fontFamily: font.medium, fontSize: 11.5, lineHeight: 16, color: c.brass }}>
+        <Text style={{ flex: 1, fontFamily: font.medium, fontSize: 11.5, lineHeight: leading(11.5), color: c.brass }}>
           {lang === 'hi'
             ? 'इस बिल्ड में बैंक हेल्पलाइन डायरेक्टरी नहीं जुड़ी है। नंबर अपने कार्ड के पीछे या बैंक की ऐप में देखें — ग़लत नंबर पर समय बर्बाद होता है।'
             : 'The bank helpline directory is not wired into this build. Use the number on the back of your card or inside your bank app — a wrong number costs you the window.'}

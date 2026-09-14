@@ -225,6 +225,17 @@ export const radius = {
   pill: 999,
 } as const;
 
+/**
+ * Devanagari matras (ि, ी, े, ै, ो, ौ, ु, ू …) sit well above and below a
+ * Latin cap-height, so a line-height tuned tight for English clips them —
+ * worst on `numberOfLines`, where react-native-web crops hard to
+ * `lineHeight * lines`. Every Text uses Hind for both scripts (see `font`
+ * above), so this floor applies everywhere, not just Hindi-only surfaces.
+ */
+export function leading(size: number, ratio = 1.42): number {
+  return Math.round(size * ratio * 2) / 2;
+}
+
 /** Cross-platform card lift. Android needs elevation, iOS needs the shadow. */
 export function cardShadow(color: string) {
   return {

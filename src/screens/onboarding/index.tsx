@@ -21,7 +21,7 @@ import { useLang } from '../../i18n/LanguageProvider';
 import { StringKey } from '../../i18n/strings';
 import { useApp } from '../../state/AppState';
 import { useTheme } from '../../theme/ThemeProvider';
-import { font, radius, space } from '../../theme/tokens';
+import { font, leading, radius, space } from '../../theme/tokens';
 
 export type OnboardParamList = {
   Carousel: undefined;
@@ -141,7 +141,7 @@ export function CarouselScreen() {
           >
             <Icon name={slide.icon} size={30} color={c.leaf} />
           </View>
-          <Text style={{ fontFamily: font.display, fontSize: 32, lineHeight: 39, color: c.ink }}>
+          <Text style={{ fontFamily: font.display, fontSize: 32, lineHeight: leading(32), color: c.ink }}>
             {t(slide.title)}
           </Text>
           <Body size={15}>{t(slide.body)}</Body>
@@ -284,7 +284,7 @@ export function OtpScreen() {
           person to pass one on, and no screen ever requests an existing OTP. */}
       <View style={{ flexDirection: 'row', alignItems: 'center', gap: space.sm }}>
         <Icon name="shieldCheck" size={14} color={c.leaf} />
-        <Text style={{ flex: 1, fontFamily: font.medium, fontSize: 11.5, lineHeight: 16, color: c.ink3 }}>
+        <Text style={{ flex: 1, fontFamily: font.medium, fontSize: 11.5, lineHeight: leading(11.5), color: c.ink3 }}>
           {t('common.otpNotice')}
         </Text>
       </View>
@@ -568,7 +568,7 @@ export function PlanScreen() {
             }}
           />
           {/* No price and no purchase control: checkout lives on the web (FR-SUB-02). */}
-          <Text style={{ textAlign: 'center', fontFamily: font.regular, fontSize: 11.5, lineHeight: 16, color: c.ink3 }}>
+          <Text style={{ textAlign: 'center', fontFamily: font.regular, fontSize: 11.5, lineHeight: leading(11.5), color: c.ink3 }}>
             {t('ob.plan.webNote')}
           </Text>
         </>

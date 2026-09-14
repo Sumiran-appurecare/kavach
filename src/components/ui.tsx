@@ -15,7 +15,7 @@ import {
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useLang } from '../i18n/LanguageProvider';
 import { useTheme } from '../theme/ThemeProvider';
-import { cardShadow, font, radius, space } from '../theme/tokens';
+import { cardShadow, font, leading, radius, space } from '../theme/tokens';
 import { Icon, IconName } from './Icon';
 
 // ── layout ────────────────────────────────────────────────────────────
@@ -115,7 +115,7 @@ export function AppHeader({
           flex: 1,
           fontFamily: font.display,
           fontSize: 22,
-          lineHeight: 28,
+          lineHeight: leading(22),
           color: c.ink,
         }}
         numberOfLines={1}
@@ -199,7 +199,7 @@ export function SectionLabel({
 export function Title({ children, style }: { children: React.ReactNode; style?: StyleProp<TextStyle> }) {
   const { c } = useTheme();
   return (
-    <Text style={[{ fontFamily: font.display, fontSize: 24, lineHeight: 30, color: c.ink }, style]}>
+    <Text style={[{ fontFamily: font.display, fontSize: 24, lineHeight: leading(24), color: c.ink }, style]}>
       {children}
     </Text>
   );
@@ -539,7 +539,7 @@ export function ListRow({
       <View style={{ flex: 1, minWidth: 0 }}>
         <Text style={{ fontFamily: font.medium, fontSize: 14, color: c.ink }}>{title}</Text>
         {sub ? (
-          <Text style={{ fontFamily: font.regular, fontSize: 11.5, lineHeight: 16, color: c.ink3, marginTop: 1 }}>
+          <Text style={{ fontFamily: font.regular, fontSize: 11.5, lineHeight: leading(11.5), color: c.ink3, marginTop: 1 }}>
             {sub}
           </Text>
         ) : null}
@@ -624,7 +624,7 @@ export function OtpNotice({ onDark = false }: { onDark?: boolean }) {
       }}
     >
       <Icon name="shieldCheck" size={15} color={fg} />
-      <Text style={{ flex: 1, fontFamily: font.semibold, fontSize: 11.5, lineHeight: 16, color: fg }}>
+      <Text style={{ flex: 1, fontFamily: font.semibold, fontSize: 11.5, lineHeight: leading(11.5), color: fg }}>
         {t('common.otpNotice')}
       </Text>
     </View>

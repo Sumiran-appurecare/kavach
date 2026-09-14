@@ -23,7 +23,7 @@ import { StringKey } from '../i18n/strings';
 import { Nav } from '../navigation/types';
 import { useApp } from '../state/AppState';
 import { useTheme } from '../theme/ThemeProvider';
-import { font, radius, space } from '../theme/tokens';
+import { font, leading, radius, space } from '../theme/tokens';
 
 const TYPES: { value: ArtefactType; label: StringKey; placeholder: StringKey }[] = [
   { value: 'sms', label: 'scm.type.sms', placeholder: 'scm.placeholder.sms' },
@@ -169,7 +169,7 @@ export function ShieldScreen() {
         <SectionLabel>{t('scm.today')}</SectionLabel>
         <Card style={{ gap: space.md }}>
           <Chip label={t('scm.verdict.dangerous')} tone="siren" />
-          <Text style={{ fontFamily: font.display, fontSize: 18, lineHeight: 25, color: c.ink }}>
+          <Text style={{ fontFamily: font.display, fontSize: 18, lineHeight: leading(18), color: c.ink }}>
             {SCAM_OF_THE_DAY.title[lang]}
           </Text>
           <Body size={13}>{SCAM_OF_THE_DAY.body[lang]}</Body>
@@ -287,7 +287,7 @@ function ResultCard({ result }: { result: ScamResult }) {
           />
         </View>
         <View style={{ flex: 1, minWidth: 0 }}>
-          <Text style={{ fontFamily: font.display, fontSize: 20, lineHeight: 25, color: colour }}>
+          <Text style={{ fontFamily: font.display, fontSize: 20, lineHeight: leading(20), color: colour }}>
             {t(`scm.verdict.${result.verdict}` as StringKey)}
           </Text>
           <Mono size={10}>{`${Math.round(result.confidence * 100)}% ${t('scm.confidence')}`}</Mono>

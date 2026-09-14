@@ -21,7 +21,7 @@ import { StringKey } from '../i18n/strings';
 import { Nav } from '../navigation/types';
 import { useApp } from '../state/AppState';
 import { useTheme } from '../theme/ThemeProvider';
-import { font, radius, space } from '../theme/tokens';
+import { font, leading, radius, space } from '../theme/tokens';
 
 const CATEGORIES: { value: ConsultCategory; label: StringKey }[] = [
   { value: 'property', label: 'con.cat.property' },
@@ -170,7 +170,7 @@ function Consent() {
     <View style={{ paddingHorizontal: space.lg, gap: space.md }}>
       <Steps current={1} />
       <Card style={{ gap: space.md }}>
-        <Text style={{ fontFamily: font.display, fontSize: 20, lineHeight: 26, color: c.ink }}>
+        <Text style={{ fontFamily: font.display, fontSize: 20, lineHeight: leading(20), color: c.ink }}>
           {t('con.engagement.title')}
         </Text>
         {(['con.engagement.b1', 'con.engagement.b2', 'con.engagement.b3', 'con.engagement.b4'] as const).map(
@@ -219,7 +219,7 @@ function Allocation() {
         <Steps current={2} />
         <Card style={{ gap: space.md, alignItems: 'center', paddingVertical: space.xxl }}>
           <ActivityIndicator color={c.forest} />
-          <Text style={{ fontFamily: font.display, fontSize: 19, lineHeight: 25, color: c.ink, textAlign: 'center' }}>
+          <Text style={{ fontFamily: font.display, fontSize: 19, lineHeight: leading(19), color: c.ink, textAlign: 'center' }}>
             {t('con.allocating')}
           </Text>
           <Body size={12.5} style={{ textAlign: 'center' }}>
@@ -242,7 +242,7 @@ function Allocation() {
         </View>
         <Chip label={t('con.allocated')} tone="leaf" />
         <View>
-          <Text style={{ fontFamily: font.display, fontSize: 22, lineHeight: 28, color: c.ink }}>
+          <Text style={{ fontFamily: font.display, fontSize: 22, lineHeight: leading(22), color: c.ink }}>
             {advocate.name}
           </Text>
           <Mono size={11}>{`${t('con.enrolment')} ${advocate.enrolmentNo}`}</Mono>

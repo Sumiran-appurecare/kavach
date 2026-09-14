@@ -20,7 +20,7 @@ import { useLang } from '../i18n/LanguageProvider';
 import { Nav } from '../navigation/types';
 import { useApp } from '../state/AppState';
 import { ThemeChoice, useTheme } from '../theme/ThemeProvider';
-import { font, radius, space } from '../theme/tokens';
+import { font, leading, radius, space } from '../theme/tokens';
 
 export function MoreScreen() {
   const { c, choice, setChoice } = useTheme();
@@ -60,7 +60,7 @@ export function MoreScreen() {
               >
                 {t('more.plan')}
               </Text>
-              <Text style={{ fontFamily: font.display, fontSize: 24, lineHeight: 30, color: c.ink, marginTop: 2 }}>
+              <Text style={{ fontFamily: font.display, fontSize: 24, lineHeight: leading(24), color: c.ink, marginTop: 2 }}>
                 {free ? t('more.planFree') : plan}
               </Text>
             </View>

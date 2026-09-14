@@ -20,7 +20,7 @@ import { StringKey } from '../i18n/strings';
 import { Nav } from '../navigation/types';
 import { useApp } from '../state/AppState';
 import { useTheme } from '../theme/ThemeProvider';
-import { font, radius, space } from '../theme/tokens';
+import { font, leading, radius, space } from '../theme/tokens';
 
 /**
  * The home screen scrolls, so the layout no longer has to fight to fit and
@@ -114,12 +114,12 @@ export function HomeScreen() {
 
         <View style={{ flexDirection: 'row', alignItems: 'flex-end', justifyContent: 'space-between', gap: space.md }}>
           <View style={{ flex: 1, minWidth: 0 }}>
-            <Text style={{ fontFamily: font.bold, fontSize: 20, lineHeight: 26, color: c.onForest }} numberOfLines={1}>
+            <Text style={{ fontFamily: font.bold, fontSize: 20, lineHeight: leading(20), color: c.onForest }} numberOfLines={1}>
               {`${t(greetingKey)}, `}
               <Text style={{ color: c.onForestAccent }}>{`${firstName}!`}</Text>
             </Text>
             <Text
-              style={{ fontFamily: font.regular, fontSize: 12, lineHeight: 16, color: c.onForestDim }}
+              style={{ fontFamily: font.regular, fontSize: 12, lineHeight: leading(12), color: c.onForestDim }}
               numberOfLines={1}
             >
               {t('home.centerTitle')}
@@ -255,7 +255,7 @@ function SectionRow({ title, action, onAction }: { title: string; action?: strin
   const { c } = useTheme();
   return (
     <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: space.md }}>
-      <Text style={{ fontFamily: font.bold, fontSize: 12.5, lineHeight: 16, color: c.ink }}>{title}</Text>
+      <Text style={{ fontFamily: font.bold, fontSize: 12.5, lineHeight: leading(12.5), color: c.ink }}>{title}</Text>
       {action ? (
         <Pressable onPress={onAction} hitSlop={8} style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
           <Text style={{ fontFamily: font.semibold, fontSize: 11, color: c.accent }}>{action}</Text>
@@ -559,7 +559,7 @@ function EmergencyDial({ mode }: { mode: Mode }) {
             </Text>
           </View>
           <Text
-            style={{ fontFamily: font.regular, fontSize: 8.5, lineHeight: 11, color: '#FFE0E3' }}
+            style={{ fontFamily: font.regular, fontSize: 8.5, lineHeight: leading(8.5), color: '#FFE0E3' }}
             numberOfLines={1}
           >
             {sub}
@@ -654,12 +654,20 @@ function Tile({
       </View>
       <View>
         <Text
-          style={{ fontFamily: font.bold, fontSize: tight ? 11.5 : 12.5, lineHeight: tight ? 14 : 15, color: c.ink }}
+          style={{
+            fontFamily: font.bold,
+            fontSize: tight ? 11.5 : 12.5,
+            lineHeight: tight ? leading(11.5) : leading(12.5),
+            color: c.ink,
+          }}
           numberOfLines={1}
         >
           {title}
         </Text>
-        <Text style={{ fontFamily: font.regular, fontSize: 9.5, lineHeight: 12, color: descTint ?? c.ink2 }} numberOfLines={1}>
+        <Text
+          style={{ fontFamily: font.regular, fontSize: 9.5, lineHeight: leading(9.5), color: descTint ?? c.ink2 }}
+          numberOfLines={1}
+        >
           {desc}
         </Text>
       </View>
@@ -713,7 +721,7 @@ function ActiveCaseCard({ mode }: { mode: Mode }) {
           <Icon name="folder" size={17} color={c.siren} />
         </View>
         <View style={{ flex: 1, minWidth: 0 }}>
-          <Text style={{ fontFamily: font.bold, fontSize: 13, lineHeight: 17, color: c.ink }} numberOfLines={1}>
+          <Text style={{ fontFamily: font.bold, fontSize: 13, lineHeight: leading(13), color: c.ink }} numberOfLines={1}>
             {t('case.cyberFraud')}
           </Text>
           <Text style={{ fontFamily: font.mono, fontSize: 9, color: c.ink3 }} numberOfLines={1}>
@@ -814,7 +822,7 @@ function UpcomingSection({ mode }: { mode: Mode }) {
             style={{
               fontFamily: font.regular,
               fontSize: 11.5,
-              lineHeight: 15,
+              lineHeight: leading(11.5),
               color: c.ink3,
               paddingVertical: space.md,
             }}
@@ -869,7 +877,7 @@ function UpcomingSection({ mode }: { mode: Mode }) {
                     minWidth: 0,
                     fontFamily: font.semibold,
                     fontSize: tight ? 12 : 12.5,
-                    lineHeight: 16,
+                    lineHeight: tight ? leading(12) : leading(12.5),
                     color: c.ink,
                   }}
                   numberOfLines={1}
@@ -940,10 +948,10 @@ function DigiLockerCard() {
         <Icon name="folder" size={18} color={c.accent} strokeWidth={1.7} />
       </View>
       <View style={{ flex: 1, minWidth: 0, gap: 1 }}>
-        <Text style={{ fontFamily: font.bold, fontSize: 13, lineHeight: 17, color: c.ink }} numberOfLines={1}>
+        <Text style={{ fontFamily: font.bold, fontSize: 13, lineHeight: leading(13), color: c.ink }} numberOfLines={1}>
           {t('dl.title')}
         </Text>
-        <Text style={{ fontFamily: font.regular, fontSize: 10.5, lineHeight: 14, color: c.ink2 }} numberOfLines={2}>
+        <Text style={{ fontFamily: font.regular, fontSize: 10.5, lineHeight: leading(10.5), color: c.ink2 }} numberOfLines={2}>
           {t('dl.sub')}
         </Text>
       </View>
@@ -1011,11 +1019,16 @@ function PromoCards({ mode }: { mode: Mode }) {
         </View>
         <View style={{ gap: 2 }}>
           <Text
-            style={{ fontFamily: font.bold, fontSize: tight ? 12.5 : 13.5, lineHeight: 17, color: c.onForest }}
+            style={{
+              fontFamily: font.bold,
+              fontSize: tight ? 12.5 : 13.5,
+              lineHeight: tight ? leading(12.5) : leading(13.5),
+              color: c.onForest,
+            }}
           >
             {t('promo.draft.title')}
           </Text>
-          <Text style={{ fontFamily: font.regular, fontSize: 10, lineHeight: 13.5, color: c.onForestDim }}>
+          <Text style={{ fontFamily: font.regular, fontSize: 10, lineHeight: leading(10), color: c.onForestDim }}>
             {t('promo.draft.sub')}
           </Text>
         </View>
@@ -1055,10 +1068,17 @@ function PromoCards({ mode }: { mode: Mode }) {
           <Icon name="scales" size={16} color={c.brass} strokeWidth={1.7} />
         </View>
         <View style={{ gap: 2 }}>
-          <Text style={{ fontFamily: font.bold, fontSize: tight ? 12.5 : 13.5, lineHeight: 17, color: c.ink }}>
+          <Text
+            style={{
+              fontFamily: font.bold,
+              fontSize: tight ? 12.5 : 13.5,
+              lineHeight: tight ? leading(12.5) : leading(13.5),
+              color: c.ink,
+            }}
+          >
             {t('promo.advice.title')}
           </Text>
-          <Text style={{ fontFamily: font.regular, fontSize: 10, lineHeight: 13.5, color: c.ink2 }}>
+          <Text style={{ fontFamily: font.regular, fontSize: 10, lineHeight: leading(10), color: c.ink2 }}>
             {t('promo.advice.sub')}
           </Text>
         </View>
@@ -1139,7 +1159,7 @@ function EmergencyFlank({
         style={{
           fontFamily: font.bold,
           fontSize: tight ? 10 : 10.5,
-          lineHeight: tight ? 12.5 : 13,
+          lineHeight: tight ? leading(10) : leading(10.5),
           color: c.sirenDeep,
           textAlign: 'center',
         }}
@@ -1151,7 +1171,7 @@ function EmergencyFlank({
         style={{
           fontFamily: font.regular,
           fontSize: 8,
-          lineHeight: 10.5,
+          lineHeight: leading(8),
           color: subTint ?? c.ink2,
           textAlign: 'center',
         }}

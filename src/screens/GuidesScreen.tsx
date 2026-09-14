@@ -7,7 +7,7 @@ import { useLang } from '../i18n/LanguageProvider';
 import { Nav } from '../navigation/types';
 import { GUIDES } from '../state/AppState';
 import { useTheme } from '../theme/ThemeProvider';
-import { font, radius, space } from '../theme/tokens';
+import { font, leading, radius, space } from '../theme/tokens';
 
 /**
  * The Content Library, read-only for subscribers. Only approved entries are
@@ -58,7 +58,7 @@ export function GuidesScreen() {
                     backgroundColor: pressed ? c.card2 : 'transparent',
                   })}
                 >
-                  <Text style={{ flex: 1, fontFamily: font.semibold, fontSize: 14.5, lineHeight: 20, color: c.ink }}>
+                  <Text style={{ flex: 1, fontFamily: font.semibold, fontSize: 14.5, lineHeight: leading(14.5), color: c.ink }}>
                     {entry.question[lang]}
                   </Text>
                   <Icon name={expanded ? 'chevronDown' : 'chevronRight'} size={17} color={c.ink3} />

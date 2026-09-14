@@ -22,7 +22,7 @@ import { rupees, useLang } from '../i18n/LanguageProvider';
 import { Nav } from '../navigation/types';
 import { useApp } from '../state/AppState';
 import { useTheme } from '../theme/ThemeProvider';
-import { font, radius, space } from '../theme/tokens';
+import { font, leading, radius, space } from '../theme/tokens';
 
 /**
  * The case screen. Everything here is measured against one question: did both
@@ -209,7 +209,7 @@ export function FraudCaseScreen() {
           </View>
           <View style={{ flex: 1, minWidth: 0 }}>
             <Text style={{ fontFamily: font.medium, fontSize: 14, color: c.ink }}>{t('case.letter')}</Text>
-            <Text style={{ fontFamily: font.regular, fontSize: 11.5, lineHeight: 16, color: c.ink3, marginTop: 1 }}>
+            <Text style={{ fontFamily: font.regular, fontSize: 11.5, lineHeight: leading(11.5), color: c.ink3, marginTop: 1 }}>
               {t('case.letterSub')}
             </Text>
           </View>
@@ -314,7 +314,7 @@ function ReportBlock({
         <Icon name={done ? 'checkCircle' : 'dashCircle'} size={22} color={done ? c.leaf : c.brass} />
         <View style={{ flex: 1, minWidth: 0 }}>
           <Text style={{ fontFamily: font.semibold, fontSize: 14.5, color: c.ink }}>{title}</Text>
-          <Text style={{ fontFamily: font.regular, fontSize: 11.5, lineHeight: 16, color: c.ink3, marginTop: 1 }}>
+          <Text style={{ fontFamily: font.regular, fontSize: 11.5, lineHeight: leading(11.5), color: c.ink3, marginTop: 1 }}>
             {sub}
           </Text>
         </View>

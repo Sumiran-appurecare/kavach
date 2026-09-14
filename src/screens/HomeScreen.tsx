@@ -195,7 +195,7 @@ export function HomeScreen() {
               title={t('f.docIntel')}
               desc={t('f.docIntel.desc')}
               mode={mode}
-              onPress={() => nav.navigate('Vault')}
+              onPress={() => nav.navigate('DocIntel')}
             />
           </View>
           <View style={{ flexDirection: 'row', gap: space.sm }}>
@@ -227,7 +227,7 @@ export function HomeScreen() {
               desc={vehicleDesc}
               descTint={vehicleLate ? c.siren : undefined}
               mode={mode}
-              onPress={() => nav.navigate('Vault')}
+              onPress={() => nav.navigate('Vehicle')}
             />
             <Tile
               icon="evidence"

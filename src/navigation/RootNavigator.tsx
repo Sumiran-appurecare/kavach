@@ -9,6 +9,7 @@ import { StringKey } from '../i18n/strings';
 import { AssistantScreen } from '../screens/AssistantScreen';
 import { CasesScreen } from '../screens/CasesScreen';
 import { ConsultScreen } from '../screens/ConsultScreen';
+import { DocIntelScreen } from '../screens/DocIntelScreen';
 import { DocumentScreen } from '../screens/DocumentScreen';
 import { EmergencyScreen } from '../screens/EmergencyScreen';
 import { FraudCaseScreen } from '../screens/FraudCaseScreen';
@@ -19,6 +20,7 @@ import { MoreScreen } from '../screens/MoreScreen';
 import { ServicesScreen } from '../screens/ServicesScreen';
 import { ShieldScreen } from '../screens/ShieldScreen';
 import { VaultScreen } from '../screens/VaultScreen';
+import { VehicleScreen } from '../screens/VehicleScreen';
 import {
   CarouselScreen,
   KitScreen,
@@ -148,6 +150,8 @@ export function RootNavigator() {
           <Stack.Screen name="Vault" component={VaultScreen} />
           <Stack.Screen name="Assistant" component={AssistantScreen} />
           <Stack.Screen name="Insurance" component={InsuranceScreen} />
+          <Stack.Screen name="Vehicle" component={VehicleScreen} />
+          <Stack.Screen name="DocIntel" component={DocIntelScreen} />
           <Stack.Screen name="More" component={MoreScreen} />
         </>
       ) : (

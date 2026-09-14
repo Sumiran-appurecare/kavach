@@ -12,6 +12,8 @@ export type RootStackParamList = {
   Vault: undefined;
   Assistant: undefined;
   Insurance: undefined;
+  Vehicle: undefined;
+  DocIntel: undefined;
   More: undefined;
 };
 

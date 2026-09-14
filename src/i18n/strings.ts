@@ -113,6 +113,33 @@ export const strings = {
   'ins.askAdvocate': { en: 'A claim was rejected — talk to an advocate', hi: 'क्लेम रिजेक्ट हुआ — वकील से बात करें' },
   'ins.askQuestion': { en: 'Ask how a claim works', hi: 'क्लेम कैसे होता है, पूछें' },
 
+  // ── vehicle documents ────────────────────────────────────────────────
+  'veh.title': { en: 'Vehicle Documents', hi: 'वाहन दस्तावेज़' },
+  'veh.lead': {
+    en: 'RC, PUC and fitness dates for your vehicle, read off what you have uploaded.',
+    hi: 'आपके वाहन की RC, PUC और फ़िटनेस तारीखें, आपके अपलोड किए दस्तावेज़ों से पढ़ी गईं।',
+  },
+  'veh.documents': { en: 'Your vehicle papers', hi: 'आपके वाहन के काग़ज़ात' },
+  'veh.none': { en: 'No vehicle document in your vault yet', hi: 'तिजोरी में अभी कोई वाहन दस्तावेज़ नहीं' },
+  'veh.addDoc': { en: 'Add a vehicle document', hi: 'वाहन दस्तावेज़ जोड़ें' },
+  'veh.askQuestion': { en: 'Ask a question about renewal', hi: 'नवीनीकरण के बारे में पूछें' },
+  'veh.askAdvocate': { en: 'Got a challan or fine — talk to an advocate', hi: 'चालान हुआ — वकील से बात करें' },
+
+  // ── document intelligence ────────────────────────────────────────────
+  'doci.title': { en: 'Document Intelligence', hi: 'दस्तावेज़ समझें' },
+  'doci.lead': {
+    en: 'Every document you add gets read and explained in plain language — never advice, just what it says.',
+    hi: 'आप जो भी दस्तावेज़ जोड़ते हैं, उसे पढ़कर सरल भाषा में समझाया जाता है — सलाह नहीं, बस वह जो उसमें लिखा है।',
+  },
+  'doci.explained': { en: 'Explained for you', hi: 'आपके लिए समझाया गया' },
+  'doci.pending': { en: 'Other documents', hi: 'अन्य दस्तावेज़' },
+  'doci.extracted': { en: 'Details read, nothing to explain', hi: 'जानकारी पढ़ी गई, समझाने को कुछ नहीं' },
+  'doci.none': {
+    en: 'Add a document to your vault to see it explained here',
+    hi: 'यहाँ समझाने के लिए तिजोरी में एक दस्तावेज़ जोड़ें',
+  },
+  'doci.addDoc': { en: 'Add a document', hi: 'दस्तावेज़ जोड़ें' },
+
   // ── onboarding ──────────────────────────────────────────────────────
   'ob.slide1.title': { en: 'Your documents, only yours', hi: 'आपके दस्तावेज़, सिर्फ़ आपके' },
   'ob.slide1.body': {
